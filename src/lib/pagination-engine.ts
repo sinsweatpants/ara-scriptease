@@ -62,7 +62,7 @@ export class PaginationEngine {
       }
 
       // Basmala detection
-      if (line.includes('بسم الله الرحمن الرحيم')) {
+      if (/^\s*بسم\s+الله\s+الرحمن\s+الرحيم\s*$/.test(line)) {
         elements.push({
           type: 'basmala',
           content: line,
@@ -301,7 +301,7 @@ export class PaginationEngine {
 
   // Helper methods
   private isCharacterName(line: string): boolean {
-    return line.match(/^[أ-ي\s]+:$/) !== null;
+    return /^\s*[\u0600-\u06FF][\u0600-\u06FF\s]{0,40}\s*:\s*$/.test(line);
   }
 
   private isParenthetical(line: string): boolean {

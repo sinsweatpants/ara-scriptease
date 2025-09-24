@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار الترقيم التلقائي للصفحات</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .test-panel {
+            background: white;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .input-area {
+            width: 100%;
+            height: 200px;
+            font-family: 'Times New Roman', serif;
+            font-size: 14px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            direction: rtl;
+        }
+
+        /* Pagination Styles */
+        .screenplay-pages {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            background-color: #f5f5f5;
+            padding: 20px;
+            min-height: 400px;
+        }
+
+        .page {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            overflow: hidden;
+            page-break-after: always;
+        }
+
+        .page-content {
+            padding: 1in 1in 1in 1.5in;
+            height: calc(297mm - 2in);
+            overflow: hidden;
+            direction: rtl;
+            box-sizing: border-box;
+            font-family: 'Amiri', 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .page-number {
+            position: absolute;
+            bottom: 0.5in;
+            left: 1in;
+            font-size: 10pt;
+            color: #666;
+        }
+
+        .page-overflow-indicator {
+            position: absolute;
+            bottom: 1in;
+            right: 1.5in;
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px dashed red;
+            padding: 2px 4px;
+            font-size: 8pt;
+            color: red;
+        }
+
+        .page.overflow .page-overflow-indicator {
+            display: block;
+        }
+
+        /* Element Styles */
+        .basmala {
+            text-align: left;
+            margin: 0 0 2rem 0;
+            font-weight: bold;
+            font-size: 14pt;
+        }
+
+        .scene-header-container {
+            width: 100%;
+            margin-bottom: 20px;
+            background: rgba(0, 100, 200, 0.1);
+            padding: 10px;
+            border-radius: 6px;
+        }
+
+        .scene-header-top-line {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            margin: 0;
+            font-weight: bold;
+        }
+
+        .scene-header-3 {
+            text-align: center;
+            font-weight: bold;
+            margin: 5px 0 0 0;
+        }
+
+        .action {
+            text-align: right;
+            margin: 1rem 0;
+            font-size: 12pt;
+        }
+
+        .dialogue-block {
+            margin: 15px 0;
+            background: rgba(0, 200, 100, 0.1);
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .character-name {
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 0 auto;
+            width: 2.5in;
+        }
+
+        .parenthetical {
+            text-align: center;
+            font-style: italic;
+            margin: 0 auto;
+            width: 2.0in;
+        }
+
+        .dialogue-text {
+            text-align: center;
+            margin: 0 auto 0.3rem auto;
+            width: 2.5in;
+            line-height: 1.2;
+        }
+
+        .transition {
+            text-align: center;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 1rem 0;
+            background: rgba(200, 100, 0, 0.1);
+            padding: 10px;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin: 10px 0;
+        }
+
+        button {
+            padding: 8px 16px;
+            border: 1px solid #ccc;
+            background: #f9f9f9;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #e9e9e9;
+        }
+
+        .stats {
+            background: #333;
+            color: white;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-panel">
+        <h2>🔄 اختبار الترقيم التلقائي للصفحات</h2>
+        <p>أدخل نص السيناريو أدناه واختبر التقسيم التلقائي للصفحات مع الالتزام بحدود A4</p>
+
+        <textarea class="input-area" id="screenplay-input" placeholder="أدخل نص السيناريو هنا...">بسم الله الرحمن الرحيم
+
+مشهد 1 ليل-داخلي
+شقة هند في بيروت
+
+ترقد هند على السرير وهي تنظر إلى السقف. الغرفة مضاءة بنور خافت من مصباح جانبي. تبدو قلقة ولا تستطيع النوم.
+
+هند:
+(هامسة لنفسها)
+لا أستطيع النوم... هذا القلق يقتلني.
+
+تجلس على السرير وتمسك بهاتفها، تتردد قبل أن تطلب رقماً. تنظر إلى الساعة على الطاولة الجانبية - منتصف الليل.
+
+هند:
+(تطلب رقماً)
+آلو... ماما؟ أعذريني على الاتصال في هذا الوقت المتأخر.
+
+صوت الأم من الهاتف، دافئ ومطمئن. هند تتكلم بصوت منخفض.
+
+هند:
+أنا بخير، بس مش قادرة أنام. عندي امتحان مهم بكرا وخايفة أكون نسيت كل شي.
+
+قطع إلى
+
+مشهد 2 نهار-خارجي
+الشارع أمام الجامعة
+
+صباح مشمس، طلاب يتجولون في الساحة متجهين إلى قاعات الامتحانات. هند تسير بسرعة وهي تحمل حقيبتها، تبدو أكثر ثقة من الليلة الماضية.
+
+تلتقي بصديقتها سارة عند البوابة الرئيسية.
+
+سارة:
+صباح الخير يا هند! تبدين متعبة شوي.
+
+هند:
+(تبتسم)
+لم أنم جيداً الليلة الماضية، بس أحسن من أمس.
+كان لدي الكثير للتفكير فيه، بس الحمد لله كله تمام.
+
+سارة:
+(تربت على كتفها)
+ما تخافي، إنت محضرة منيح. يالله نروح نشرب قهوة قبل الامتحان.
+
+تدخلان معاً إلى مبنى الجامعة وسط زحمة الطلاب. الكاميرا تتبعهما وهما يمشيان في الممر الطويل.
+
+قطع إلى
+
+مشهد 3 داخلي-نهار
+قاعة الامتحانات
+
+قاعة كبيرة مليئة بالطلاب، الجميع يحضر أوراقه وأقلامه. هند تجلس في المقدمة، تأخذ نفساً عميقاً وتنظر حولها.
+
+الأستاذ يدخل حاملاً أوراق الامتحان.
+
+الأستاذ:
+صباح الخير جميعاً. عندكم ساعتين للإجابة على جميع الأسئلة.
+إذا في أي استفسار، ارفعوا إيدكم.
+
+يبدأ توزيع الأوراق. هند تستلم ورقتها وتقرأ الأسئلة بتركيز.
+
+هند:
+(تفكر في نفسها)
+الحمد لله، الأسئلة واضحة وأنا أعرف إجاباتها.
+
+تبدأ بالكتابة بثقة. الكاميرا تظهر تعابير وجهها وهي تنتقل من القلق إلى الراحة والثقة.
+
+انتهاء</textarea>
+
+        <div class="controls">
+            <button onclick="testPagination()">اختبر الترقيم</button>
+            <button onclick="clearResults()">مسح النتائج</button>
+        </div>
+
+        <div id="stats" class="stats" style="display: none;"></div>
+    </div>
+
+    <div id="pagination-result"></div>
+
+    <script type="module">
+        // Simple pagination engine for testing
+        class SimplePaginationEngine {
+            constructor() {
+                this.maxPageHeight = 700; // Approximate content height for A4
+            }
+
+            analyzeContent(text) {
+                const lines = text.split('\n');
+                const elements = [];
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+
+                    if (!line) {
+                        elements.push({
+                            type: 'action',
+                            content: '',
+                            estimatedHeight: 12,
+                            lineCount: 1
+                        });
+                        continue;
+                    }
+
+                    if (/^\s*بسم\s+الله\s+الرحمن\s+الرحيم\s*$/.test(line)) {
+                        elements.push({
+                            type: 'basmala',
+                            content: line,
+                            estimatedHeight: 36,
+                            lineCount: 1
+                        });
+                    }
+                    else if (line.match(/^(مشهد|م\.)\s*\d+/i)) {
+                        let sceneContent = line;
+                        let lineCount = 1;
+
+                        if (i + 1 < lines.length && lines[i + 1].trim() &&
+                            !this.isNewElement(lines[i + 1].trim())) {
+                            i++;
+                            sceneContent += '\n' + lines[i].trim();
+                            lineCount = 2;
+                        }
+
+                        elements.push({
+                            type: 'scene-header',
+                            content: sceneContent,
+                            estimatedHeight: lineCount * 18 + 20,
+                            lineCount
+                        });
+                    }
+                    else if (this.isTransition(line)) {
+                        elements.push({
+                            type: 'transition',
+                            content: line,
+                            estimatedHeight: 24,
+                            lineCount: 1
+                        });
+                    }
+                    else if (this.isCharacterName(line)) {
+                        let dialogueContent = line;
+                        let dialogueHeight = 18;
+                        let lineCount = 1;
+
+                        while (i + 1 < lines.length && lines[i + 1].trim() &&
+                               !this.isNewElement(lines[i + 1].trim())) {
+                            i++;
+                            const dialogueLine = lines[i].trim();
+                            dialogueContent += '\n' + dialogueLine;
+                            lineCount++;
+
+                            if (this.isParenthetical(dialogueLine)) {
+                                dialogueHeight += 16;
+                            } else {
+                                dialogueHeight += 18;
+                            }
+                        }
+
+                        elements.push({
+                            type: 'dialogue',
+                            content: dialogueContent,
+                            estimatedHeight: dialogueHeight + 15,
+                            lineCount
+                        });
+                    }
+                    else {
+                        const lineCount = Math.ceil(line.length / 80);
+                        elements.push({
+                            type: 'action',
+                            content: line,
+                            estimatedHeight: lineCount * 18 + 6,
+                            lineCount
+                        });
+                    }
+                }
+
+                return elements;
+            }
+
+            createPages(elements) {
+                const pages = [];
+                let currentPage = {
+                    pageNumber: 1,
+                    elements: [],
+                    height: 0,
+                    overflow: false
+                };
+
+                for (const element of elements) {
+                    const willOverflow = currentPage.height + element.estimatedHeight > this.maxPageHeight;
+
+                    if (willOverflow && currentPage.elements.length > 0) {
+                        pages.push(currentPage);
+
+                        currentPage = {
+                            pageNumber: pages.length + 1,
+                            elements: [element],
+                            height: element.estimatedHeight,
+                            overflow: false
+                        };
+                    } else {
+                        currentPage.elements.push(element);
+                        currentPage.height += element.estimatedHeight;
+
+                        if (currentPage.height > this.maxPageHeight * 0.95) {
+                            currentPage.overflow = true;
+                        }
+                    }
+                }
+
+                if (currentPage.elements.length > 0) {
+                    pages.push(currentPage);
+                }
+
+                return pages.length > 0 ? pages : [{
+                    pageNumber: 1,
+                    elements: [],
+                    height: 0,
+                    overflow: false
+                }];
+            }
+
+            generateHTML(text) {
+                const elements = this.analyzeContent(text);
+                const pages = this.createPages(elements);
+
+                let html = '<div class="screenplay-pages">';
+
+                for (const page of pages) {
+                    const overflowClass = page.overflow ? ' overflow' : '';
+                    html += `<div class="page${overflowClass}" data-page="${page.pageNumber}">`;
+                    html += '<div class="page-content">';
+
+                    for (const element of page.elements) {
+                        html += this.elementToHTML(element);
+                    }
+
+                    html += '</div>';
+                    html += `<div class="page-number">${page.pageNumber}</div>`;
+
+                    if (page.overflow) {
+                        html += '<div class="page-overflow-indicator">تجاوز الصفحة</div>';
+                    }
+
+                    html += '</div>';
+                }
+
+                html += '</div>';
+                return { html, pages };
+            }
+
+            elementToHTML(element) {
+                const content = this.escapeHtml(element.content);
+
+                switch (element.type) {
+                    case 'basmala':
+                        return `<div class="basmala">${content}</div>`;
+
+                    case 'scene-header':
+                        return this.formatSceneHeader(content);
+
+                    case 'action':
+                        return element.content ? `<div class="action">${content}</div>` : '<div class="action"><br></div>';
+
+                    case 'dialogue':
+                        return this.formatDialogue(content);
+
+                    case 'transition':
+                        return `<div class="transition">${content}</div>`;
+
+                    default:
+                        return `<div class="action">${content}</div>`;
+                }
+            }
+
+            formatSceneHeader(content) {
+                const lines = content.split('\n');
+                const firstLine = lines[0];
+                const secondLine = lines[1] || '';
+
+                const sceneMatch = firstLine.match(/^(مشهد|م\.)\s*(\d+)\s*[-–—]?\s*(.*)/i);
+                if (sceneMatch) {
+                    const sceneNum = `${sceneMatch[1]} ${sceneMatch[2]}`;
+                    const timeLocation = sceneMatch[3] || '';
+
+                    return `
+                        <div class="scene-header-container">
+                            <div class="scene-header-top-line">
+                                <span class="scene-header-1">${this.escapeHtml(sceneNum)}</span>
+                                <span class="scene-header-2">${this.escapeHtml(timeLocation)}</span>
+                            </div>
+                            <div class="scene-header-3">${this.escapeHtml(secondLine)}</div>
+                        </div>`;
+                }
+
+                return `<div class="scene-header-container">${this.escapeHtml(content)}</div>`;
+            }
+
+            formatDialogue(content) {
+                const lines = content.split('\n');
+                let html = '<div class="dialogue-block">';
+
+                for (let i = 0; i < lines.length; i++) {
+                    const line = lines[i].trim();
+
+                    if (i === 0) {
+                        html += `<div class="character-name">${this.escapeHtml(line.replace(':', ''))}</div>`;
+                    } else if (this.isParenthetical(line)) {
+                        html += `<div class="parenthetical">${this.escapeHtml(line)}</div>`;
+                    } else {
+                        html += `<div class="dialogue-text">${this.escapeHtml(line)}</div>`;
+                    }
+                }
+
+                html += '</div>';
+                return html;
+            }
+
+            isCharacterName(line) {
+                return /^\s*[\u0600-\u06FF][\u0600-\u06FF\s]{0,40}\s*:\s*$/.test(line);
+            }
+
+            isParenthetical(line) {
+                return line.match(/^\(.*\)$/) !== null;
+            }
+
+            isTransition(line) {
+                const patterns = [
+                    /^\s*(?:قطع|إلى|ذوبان|مزج|قطع إلى|خارج المشهد|انتهاء)\s*$/i
+                ];
+                return patterns.some(pattern => pattern.test(line));
+            }
+
+            isNewElement(line) {
+                return (
+                    line.match(/^(مشهد|م\.)\s*\d+/i) !== null ||
+                    this.isTransition(line) ||
+                    this.isCharacterName(line) ||
+                    /^\s*بسم\s+الله\s+الرحمن\s+الرحيم\s*$/.test(line)
+                );
+            }
+
+            escapeHtml(text) {
+                const div = document.createElement('div');
+                div.textContent = text;
+                return div.innerHTML;
+            }
+        }
+
+        const engine = new SimplePaginationEngine();
+
+        window.testPagination = function() {
+            const input = document.getElementById('screenplay-input').value;
+            const result = engine.generateHTML(input);
+
+            document.getElementById('pagination-result').innerHTML = result.html;
+
+            // Show stats
+            const statsDiv = document.getElementById('stats');
+            statsDiv.style.display = 'block';
+            statsDiv.innerHTML = `
+                📊 إحصائيات الترقيم:
+                • عدد الصفحات: ${result.pages.length}
+                • الصفحات التي تحتوي على فائض: ${result.pages.filter(p => p.overflow).length}
+                • متوسط الارتفاع للصفحة: ${Math.round(result.pages.reduce((sum, p) => sum + p.height, 0) / result.pages.length)}px
+                • إجمالي العناصر: ${result.pages.reduce((sum, p) => sum + p.elements.length, 0)}
+            `;
+        };
+
+        window.clearResults = function() {
+            document.getElementById('pagination-result').innerHTML = '';
+            document.getElementById('stats').style.display = 'none';
+        };
+
+        // Auto test on load
+        window.testPagination();
+    </script>
+</body>
+</html>

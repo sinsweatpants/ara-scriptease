@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تحقق من معايير A4</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f0f0f0;
+            margin: 0;
+            padding: 20px;
+        }
+        .verification-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        .a4-preview {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            border: 2px solid #333;
+            margin: 20px auto;
+            position: relative;
+            box-sizing: border-box;
+        }
+        .margin-guides {
+            position: absolute;
+            border: 1px dashed #f00;
+        }
+        .margin-top { top: 1in; left: 0; right: 0; height: 0; }
+        .margin-bottom { bottom: 1in; left: 0; right: 0; height: 0; }
+        .margin-left { top: 0; bottom: 0; left: 1.5in; width: 0; }
+        .margin-right { top: 0; bottom: 0; right: 1in; width: 0; }
+
+        .content-area {
+            position: absolute;
+            top: 1in;
+            bottom: 1in;
+            left: 1.5in;
+            right: 1in;
+            background: rgba(0, 255, 0, 0.1);
+            padding: 10px;
+            box-sizing: border-box;
+            font-size: 12pt;
+            line-height: 1.5;
+        }
+
+        .measurements {
+            background: #333;
+            color: white;
+            padding: 10px;
+            font-family: monospace;
+        }
+
+        .success { color: #0a0; font-weight: bold; }
+        .error { color: #f00; font-weight: bold; }
+
+        .page-number {
+            position: absolute;
+            bottom: 0.5in;
+            left: 1in;
+            font-size: 10pt;
+            color: #666;
+        }
+
+        /* Copy exact styles from index.css */
+        .screenshot-area {
+            width: 210mm;
+            height: 297mm;
+            background: white;
+            margin: 20px auto;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            font-family: 'Amiri', 'Times New Roman', serif;
+            font-size: 12pt;
+            line-height: 1.5;
+            direction: rtl;
+            text-align: right;
+            page-break-after: always;
+        }
+
+        .screenshot-content {
+            padding: 1in 1in 1in 1.5in;
+            min-height: calc(297mm - 2in);
+            box-sizing: border-box;
+            direction: rtl;
+        }
+
+        .basmala-test { text-align: left; margin: 0 0 2rem 0; font-weight: bold; font-size: 14pt; }
+        .scene-header-test { font-weight: bold; margin: 1rem 0; font-size: 12pt; }
+        .action-test { text-align: right; margin: 1rem 0; font-size: 12pt; }
+        .character-test { text-align: center; font-weight: bold; margin: 1rem auto 0 auto; width: 2.5in; font-size: 12pt; }
+        .dialogue-test { text-align: center; margin: 0 auto 0.3rem auto; width: 2.5in; font-size: 12pt; }
+    </style>
+</head>
+<body>
+    <div class="verification-panel">
+        <h2>✅ تحقق من معايير A4 المطبقة</h2>
+        <div class="measurements">
+            <h3>📏 المقاييس المطبقة:</h3>
+            <div>🔹 قياس الصفحة: 210mm × 297mm (A4 دقيق)</div>
+            <div>🔹 الهامش العلوي: 1 بوصة (25.4mm)</div>
+            <div>🔹 الهامش السفلي: 1 بوصة (25.4mm)</div>
+            <div>🔹 الهامش الأيمن: 1 بوصة (25.4mm)</div>
+            <div>🔹 الهامش الأيسر: 1.5 بوصة (38.1mm)</div>
+            <div>🔹 الخط: Amiri/Times New Roman - 12pt</div>
+            <div>🔹 المسافة بين الأسطر: 1.5</div>
+            <div>🔹 اتجاه النص: RTL (من اليمين لليسار)</div>
+        </div>
+    </div>
+
+    <div class="verification-panel">
+        <h3>🎯 معاينة A4 مع الإرشادات</h3>
+        <div class="a4-preview">
+            <div class="margin-guides margin-top"></div>
+            <div class="margin-guides margin-bottom"></div>
+            <div class="margin-guides margin-left"></div>
+            <div class="margin-guides margin-right"></div>
+
+            <div class="content-area">
+                <div style="color: #666; font-size: 10pt; margin-bottom: 10px;">
+                    [منطقة المحتوى المسموح بها - 210mm-2.5in عرض × 297mm-2in ارتفاع]
+                </div>
+                <div>هذه هي المنطقة الصالحة للكتابة وفق معايير A4</div>
+                <div>الهوامش محددة بالخطوط المتقطعة الحمراء</div>
+            </div>
+
+            <div class="page-number">1</div>
+        </div>
+    </div>
+
+    <div class="verification-panel">
+        <h3>📄 مثال فعلي للتنسيق</h3>
+        <div class="screenshot-area">
+            <div class="screenshot-content">
+                <div class="basmala-test">بسم الله الرحمن الرحيم</div>
+
+                <div style="display: flex; justify-content: space-between; margin: 1rem 0;">
+                    <span class="scene-header-test">مشهد 1</span>
+                    <span class="scene-header-test">ليل-داخلي</span>
+                </div>
+                <div style="text-align: center; font-weight: bold; margin: 0 0 1rem 0;">شقة هند في بيروت</div>
+
+                <div class="action-test">ترقد هند على السرير وهي تنظر إلى السقف. الغرفة مضاءة بنور خافت.</div>
+
+                <div class="character-test">هند</div>
+                <div style="text-align: center; font-style: italic; margin: 0 auto; width: 2.0in;">(هامسة)</div>
+                <div class="dialogue-test">لا أستطيع النوم...</div>
+
+                <div class="action-test">تنظر إلى الساعة على الطاولة الجانبية. الساعة تشير إلى منتصف الليل.</div>
+
+                <div style="text-align: center; font-weight: bold; margin: 1rem 0;">قطع إلى</div>
+            </div>
+            <div style="position: absolute; bottom: 0.5in; left: 1in; font-size: 10pt; color: #666;">1</div>
+        </div>
+    </div>
+
+    <script>
+        // Verification measurements
+        window.addEventListener('load', function() {
+            console.log('🔍 A4 Standards Verification');
+
+            // Check A4 dimensions
+            const preview = document.querySelector('.a4-preview');
+            const rect = preview.getBoundingClientRect();
+            const widthMM = rect.width * 25.4 / 96;
+            const heightMM = rect.height * 25.4 / 96;
+
+            console.log(`📐 Page Width: ${widthMM.toFixed(1)}mm (Target: 210mm)`);
+            console.log(`📐 Page Height: ${heightMM.toFixed(1)}mm (Target: 297mm)`);
+
+            // Check margins
+            const contentArea = document.querySelector('.content-area');
+            const contentRect = contentArea.getBoundingClientRect();
+            const previewRect = preview.getBoundingClientRect();
+
+            const topMargin = (contentRect.top - previewRect.top) * 25.4 / 96;
+            const leftMargin = (contentRect.left - previewRect.left) * 25.4 / 96;
+            const rightMargin = (previewRect.right - contentRect.right) * 25.4 / 96;
+            const bottomMargin = (previewRect.bottom - contentRect.bottom) * 25.4 / 96;
+
+            console.log(`📏 Top Margin: ${topMargin.toFixed(1)}mm (Target: 25.4mm)`);
+            console.log(`📏 Left Margin: ${leftMargin.toFixed(1)}mm (Target: 38.1mm)`);
+            console.log(`📏 Right Margin: ${rightMargin.toFixed(1)}mm (Target: 25.4mm)`);
+            console.log(`📏 Bottom Margin: ${bottomMargin.toFixed(1)}mm (Target: 25.4mm)`);
+
+            // Compliance check
+            const a4Width = Math.abs(widthMM - 210) < 2;
+            const a4Height = Math.abs(heightMM - 297) < 2;
+            const marginTop = Math.abs(topMargin - 25.4) < 2;
+            const marginLeft = Math.abs(leftMargin - 38.1) < 2;
+            const marginRight = Math.abs(rightMargin - 25.4) < 2;
+            const marginBottom = Math.abs(bottomMargin - 25.4) < 2;
+
+            const compliant = a4Width && a4Height && marginTop && marginLeft && marginRight && marginBottom;
+
+            console.log(`✅ A4 Compliance: ${compliant ? 'PASSED' : 'FAILED'}`);
+        });
+    </script>
+</body>
+</html>

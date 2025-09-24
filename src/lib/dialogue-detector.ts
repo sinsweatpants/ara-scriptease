@@ -11,19 +11,72 @@ export interface DialogueBlock {
   endIndex: number;
 }
 
+// A4 Screenplay Format Styles - Mandatory Standards
+// Based on: A4 (210mm x 297mm), Margins: 1" top/bottom, 1.5" right, 1" left
 export const formatStyles: { [key: string]: CSSProperties } = {
-    basmala: { textAlign: 'left', margin: '0 0 2rem 0', fontWeight: 'bold', fontSize: '18pt' },
-    'scene-header-container': { width: '100%', marginBottom: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '6px' },
-    'scene-header-top-line': { display: 'flex', justifyContent: 'space-between', width: '100%', margin: '0rem 0 0 0' },
-    'scene-header-1': { fontWeight: 'bold', fontSize: '16pt' },
-    'scene-header-2': { fontWeight: 'normal', fontSize: '14pt', color: '#666' },
-    'scene-header-3': { textAlign: 'center', fontWeight: 'bold', margin: '4px 0 0 0', fontSize: '13pt', fontStyle: 'italic' },
-    action: { textAlign: 'right', margin: '12px 0', direction: 'rtl' },
-    'dialogue-container': { margin: '15px 0', textAlign: 'center' },
-    character: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 auto 8px auto', width: '180px', display: 'block' },
-    parenthetical: { textAlign: 'center', fontStyle: 'italic', margin: '0 auto 4px auto', width: '144px', fontSize: '11pt', display: 'block' },
-    dialogue: { textAlign: 'center', margin: '0 auto 4px auto', width: '180px', lineHeight: '1.2', display: 'block' },
-    transition: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '20px 0' }
+    basmala: {
+        textAlign: 'left',
+        margin: '0 0 2rem 0',
+        fontWeight: 'bold',
+        fontSize: '14pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    'scene-header-top-line': {
+        display: 'flex',
+        justifyContent: 'space-between',
+        width: '100%',
+        margin: '1rem 0 0.5rem 0',
+        fontWeight: 'bold',
+        fontSize: '12pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    'scene-header-3': {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        margin: '0 0 1rem 0',
+        fontSize: '12pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    action: {
+        textAlign: 'right',
+        margin: '1rem 0',
+        fontSize: '12pt',
+        lineHeight: '1.5',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    character: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        margin: '1rem auto 0 auto',
+        width: '2.5in',
+        fontSize: '12pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    parenthetical: {
+        textAlign: 'center',
+        fontStyle: 'italic',
+        margin: '0 auto',
+        width: '2.0in',
+        fontSize: '11pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    dialogue: {
+        textAlign: 'center',
+        margin: '0 auto 0.3rem auto',
+        width: '2.5in',
+        lineHeight: '1.2',
+        fontSize: '12pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    },
+    transition: {
+        textAlign: 'center',
+        fontWeight: 'bold',
+        textTransform: 'uppercase',
+        margin: '1rem 0',
+        fontSize: '12pt',
+        fontFamily: 'var(--font-arabic), Times New Roman, serif'
+    }
 };
 
 export class DialogueDetector {

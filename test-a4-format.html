@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار تنسيق A4 للسيناريو العربي</title>
+    <style>
+        /* A4 Page Specifications - Mandatory Standards */
+        .screenplay-pages {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 20px;
+          background-color: #f5f5f5;
+          padding: 20px;
+          min-height: 100vh;
+        }
+
+        .page {
+          width: 210mm;  /* A4 width - exact specification */
+          height: 297mm; /* A4 height - exact specification */
+          background: white;
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+          position: relative;
+          overflow: hidden;
+          page-break-after: always;
+        }
+
+        .page-content {
+          /* Mandatory margins: top=1", right=1", bottom=1", left=1.5" */
+          padding: 1in 1in 1in 1.5in;
+          height: calc(297mm - 2in); /* A4 height minus top/bottom margins */
+          overflow: hidden;
+          direction: rtl;
+          box-sizing: border-box;
+          font-family: 'Amiri', 'Times New Roman', serif;
+          font-size: 12pt;
+          line-height: 1.5;
+        }
+
+        .page-number {
+          position: absolute;
+          bottom: 0.5in;
+          left: 1in;
+          font-size: 10pt;
+          color: #666;
+          font-family: 'Amiri';
+          z-index: 10;
+        }
+
+        /* Screenplay element styling */
+        .basmala {
+          text-align: left;
+          margin: 0 0 2rem 0;
+          font-weight: bold;
+          font-size: 14pt;
+        }
+
+        .scene-header-top-line {
+          display: flex;
+          justify-content: space-between;
+          width: 100%;
+          margin: 1rem 0 0.5rem 0;
+          direction: rtl;
+          font-weight: bold;
+          font-size: 12pt;
+        }
+
+        .scene-header-3 {
+          text-align: center;
+          font-weight: bold;
+          margin: 0 0 1rem 0;
+          font-size: 12pt;
+        }
+
+        .action {
+          text-align: right;
+          margin: 1rem 0;
+          font-size: 12pt;
+        }
+
+        .character {
+          text-align: center;
+          font-weight: bold;
+          text-transform: uppercase;
+          margin: 1rem auto 0 auto;
+          width: 2.5in;
+          font-size: 12pt;
+        }
+
+        .parenthetical {
+          text-align: center;
+          font-style: italic;
+          margin: 0 auto;
+          width: 2.0in;
+          font-size: 11pt;
+        }
+
+        .dialogue {
+          text-align: center;
+          margin: 0 auto 0.3rem auto;
+          width: 2.5in;
+          line-height: 1.2;
+          font-size: 12pt;
+        }
+
+        .transition {
+          text-align: center;
+          font-weight: bold;
+          text-transform: uppercase;
+          margin: 1rem 0;
+          font-size: 12pt;
+        }
+
+        /* Print compliance */
+        @media print {
+          .page {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0;
+            box-shadow: none;
+            page-break-after: always;
+          }
+
+          .page-content {
+            padding: 1in 1in 1in 1.5in !important;
+            height: calc(297mm - 2in) !important;
+          }
+        }
+    </style>
+</head>
+<body>
+    <div class="screenplay-pages">
+        <div class="page">
+            <div class="page-content">
+                <div class="basmala">بسم الله الرحمن الرحيم</div>
+
+                <div class="scene-header-top-line">
+                    <span>مشهد 1</span>
+                    <span>ليل-داخلي</span>
+                </div>
+                <div class="scene-header-3">شقة هند في بيروت</div>
+
+                <div class="action">ترقد هند على السرير وهي تنظر إلى السقف بقلق. الغرفة مضاءة بنور خافت من مصباح جانبي.</div>
+
+                <div class="character">هند</div>
+                <div class="parenthetical">(هامسة لنفسها)</div>
+                <div class="dialogue">لا أستطيع النوم... هذا القلق يقتلني.</div>
+
+                <div class="action">تجلس على السرير وتمسك بهاتفها، تتردد قبل أن تطلب رقماً.</div>
+
+                <div class="character">هند</div>
+                <div class="dialogue">آلو... ماما؟</div>
+                <div class="dialogue">أعذريني على الاتصال في هذا الوقت المتأخر.</div>
+
+                <div class="transition">قطع إلى</div>
+
+                <div class="scene-header-top-line">
+                    <span>مشهد 2</span>
+                    <span>نهار-خارجي</span>
+                </div>
+                <div class="scene-header-3">الشارع أمام الجامعة</div>
+
+                <div class="action">صباح مشمس، طلاب يتجولون في الساحة. هند تسير بسرعة وهي تحمل حقيبتها.</div>
+
+                <!-- Additional content to test page overflow -->
+                <div class="action">تلتقي بصديقتها سارة عند البوابة الرئيسية.</div>
+
+                <div class="character">سارة</div>
+                <div class="dialogue">صباح الخير يا هند! تبدين متعبة.</div>
+
+                <div class="character">هند</div>
+                <div class="parenthetical">(تتنهد)</div>
+                <div class="dialogue">لم أنم جيداً الليلة الماضية.</div>
+                <div class="dialogue">كان لدي الكثير للتفكير فيه.</div>
+
+                <div class="action">تدخلان معاً إلى مبنى الجامعة وسط زحمة الطلاب.</div>
+            </div>
+            <div class="page-number">1</div>
+        </div>
+    </div>
+
+    <script>
+        // Page dimension verification
+        console.log('Page width (mm):', document.querySelector('.page').offsetWidth * 25.4 / 96);
+        console.log('Page height (mm):', document.querySelector('.page').offsetHeight * 25.4 / 96);
+        console.log('Content padding (calculated):', window.getComputedStyle(document.querySelector('.page-content')).padding);
+
+        // A4 compliance check
+        const page = document.querySelector('.page');
+        const computedStyle = window.getComputedStyle(page);
+        const widthMM = parseFloat(computedStyle.width) * 25.4 / 96;
+        const heightMM = parseFloat(computedStyle.height) * 25.4 / 96;
+
+        console.log('A4 Compliance Check:');
+        console.log('Width matches A4 (210mm):', Math.abs(widthMM - 210) < 1);
+        console.log('Height matches A4 (297mm):', Math.abs(heightMM - 297) < 1);
+
+        // Margin verification
+        const content = document.querySelector('.page-content');
+        const contentStyle = window.getComputedStyle(content);
+        console.log('Margins (top, right, bottom, left):', contentStyle.paddingTop, contentStyle.paddingRight, contentStyle.paddingBottom, contentStyle.paddingLeft);
+    </script>
+</body>
+</html>

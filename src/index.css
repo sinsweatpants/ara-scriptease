@@ -112,20 +112,71 @@
   }
 }
 
-/* Custom CSS for screenplay formatting */
+/* A4 Screenplay Formatting - Mandatory Standards */
 .screenplay-container {
-  margin-left: 1in;
-  margin-right: 1.5in;
+  /* A4 page simulation with exact margins */
+  width: 210mm;
+  max-width: 210mm;
+  min-height: 297mm;
+  background: white;
+  margin: 20px auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
   font-family: var(--font-arabic), 'Times New Roman', serif;
+  font-size: 12pt;
   line-height: 1.5;
   direction: rtl;
   text-align: right;
-  max-width: 8.5in;
-  margin: 0 auto;
-  padding: 1in;
-  background: white;
+  page-break-after: always;
+}
+
+/* Global background for page container */
+body {
+  background-color: #f5f5f5 !important;
+  margin: 0;
+  padding: 0;
+}
+
+/* Main container wrapper */
+.main-container {
+  background-color: #f5f5f5;
   min-height: 100vh;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  padding: 20px 0;
+}
+
+/* Ensure proper text rendering on A4 */
+.screenplay-container * {
+  font-family: var(--font-arabic), 'Times New Roman', serif;
+  font-size: 12pt;
+  line-height: 1.5;
+}
+
+/* RTL specific adjustments */
+.screenplay-container[dir="rtl"] {
+  text-align: right;
+}
+
+/* Print optimization */
+@media print {
+  body {
+    background: white !important;
+    margin: 0;
+  }
+
+  .main-container {
+    background: white;
+    padding: 0;
+  }
+
+  .screenplay-container {
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+
+  .editor-container {
+    overflow: visible;
+  }
 }
 
 .basmala {
@@ -150,6 +201,7 @@
   justify-content: space-between;
   width: 100%;
   margin: 0rem 0 0 0;
+  direction: rtl;
 }
 
 .scene-header-1 {
@@ -219,12 +271,29 @@
 }
 
 .editor-container {
-  min-height: 600px;
+  /* Apply A4 mandatory margins: 1" top/bottom, 1.5" left, 1" right */
+  padding: 1in 1in 1in 1.5in;
+  min-height: calc(297mm - 2in);
   border: none;
-  padding: 20px;
-  background: white;
+  background: transparent;
   direction: rtl;
   outline: none;
+  box-sizing: border-box;
+  width: 100%;
+  overflow-y: auto;
+  position: relative;
+}
+
+/* A4 Page Number */
+.screenplay-container::after {
+  content: "1";
+  position: absolute;
+  bottom: 0.5in;
+  left: 1in;
+  font-size: 10pt;
+  color: #666;
+  font-family: var(--font-arabic), 'Times New Roman', serif;
+  z-index: 10;
 }
 
 .editor-container:focus {
@@ -257,15 +326,54 @@
   background: hsl(var(--accent));
 }
 
+/* Dynamic Pagination Container */
+.screenplay-pages-container {
+  background-color: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh;
+  max-height: 70vh;
+  overflow-y: auto;
+  border-radius: 0 0 8px 8px;
+  cursor: text;
+}
+
+/* Editing state visual feedback */
+.screenplay-pages-container[contenteditable="true"] {
+  background-color: #f5f5f5;
+  border: 2px dashed #0ea5e9;
+  animation: pulse 2s infinite;
+}
+
+.screenplay-pages-container[contenteditable="false"] {
+  background-color: #f8f9fa;
+  border: 2px solid #e5e7eb;
+  cursor: default;
+}
+
+@keyframes pulse {
+  0%, 100% { border-color: #0ea5e9; }
+  50% { border-color: #22c55e; }
+}
+
+/* Page editing feedback */
+.screenplay-pages-container[contenteditable="true"] .page {
+  transform: scale(1.02);
+  transition: transform 0.3s ease;
+}
+
+.screenplay-pages-container[contenteditable="true"]:hover .page {
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+}
+
 /* A4 Page Specifications - Mandatory Standards */
 .screenplay-pages {
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 20px;
-  background-color: #f5f5f5;
-  padding: 20px;
-  min-height: 100vh;
+  background-color: transparent;
+  padding: 0;
+  min-height: auto;
 }
 
 .page {

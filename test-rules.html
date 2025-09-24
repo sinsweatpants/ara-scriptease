@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>اختبار قواعد تصنيف السيناريو</title>
+    <style>
+        body { font-family: 'Segoe UI', Arial, sans-serif; margin: 20px; }
+        .test-input { width: 100%; height: 200px; margin: 10px 0; }
+        .test-output { border: 1px solid #ccc; padding: 20px; margin: 10px 0; min-height: 200px; background-color: #f9f9f9; }
+        .scene-header-1 { font-weight: bold; }
+        .scene-header-2 { font-weight: bold; }
+        .scene-header-3 { text-align: center; font-weight: bold; }
+        .character { text-align: center; font-weight: bold; text-transform: uppercase; }
+        .dialogue { text-align: center; margin: 0 auto; width: 2.5in; }
+        .parenthetical { text-align: center; font-style: italic; margin: 0 auto; width: 2.0in; }
+        .action { text-align: right; }
+        .transition { text-align: center; font-weight: bold; text-transform: uppercase; }
+        .basmala { text-align: left; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <h1>اختبار قواعد تصنيف السيناريو العربي</h1>
+
+    <h2>النص المدخل:</h2>
+    <textarea class="test-input" id="input" placeholder="أدخل النص هنا...">بسم الله الرحمن الرحيم
+
+مشهد 1 ليل-داخلي
+شقة هند في بيروت
+
+ترقد هند على السرير وهي تنظر إلى السقف.
+
+هند:
+(هامسة)
+لا أستطيع النوم.
+
+قطع إلى
+
+مشهد 2 نهار-خارجي
+الشارع أمام الجامعة</textarea>
+
+    <h2>النتيجة المنسقة:</h2>
+    <div class="test-output" id="output"></div>
+
+    <button onclick="testParser()" style="padding: 10px 20px; font-size: 16px;">اختبر القواعد</button>
+
+    <script type="module">
+        import { parseAndFormat } from '/src/lib/screenplay-parser.ts';
+
+        window.testParser = function() {
+            const input = document.getElementById('input').value;
+            const output = parseAndFormat(input);
+            document.getElementById('output').innerHTML = output;
+        };
+
+        // Auto test on page load
+        window.testParser();
+    </script>
+</body>
+</html>
