@@ -8,6 +8,9 @@ function escapeHtml(text: string): string {
 // Import advanced dialogue detector
 import { formatStyles } from './dialogue-detector';
 import { SceneHeaderExtractor } from './scene-header-extractor';
+import { analyzeContent, type ScreenplayElement } from './pagination-engine';
+import { PaginationEngine } from './PaginationEngine';
+import { HORIZONTAL_RULER_HTML, VERTICAL_RULER_HTML } from './ruler';
 import type { CSSProperties } from 'react';
 
 // Helper function to convert style object to string
@@ -199,31 +202,178 @@ export function paginateContent(content: string, wordsPerPage: number = 250): Pa
   return pages;
 }
 
-// Import the advanced pagination engine
-import { paginationEngine } from './pagination-engine';
+function buildSceneHeaderElement(lines: string[]): HTMLElement {
+  const container = document.createElement('div');
+  container.className = 'scene-header-container';
+
+  const topLine = document.createElement('div');
+  topLine.className = 'scene-header-top-line';
+
+  const firstLine = lines[0] ?? '';
+  const secondLine = lines[1] ?? '';
+  const match = firstLine.match(/^(مشهد|م\.)\s*(\d+)\s*[-–—]?\s*(.*)$/i);
+
+  const sceneNumEl = document.createElement('span');
+  sceneNumEl.className = 'scene-header-1';
+  sceneNumEl.textContent = match ? `${match[1]} ${match[2]}` : firstLine;
+
+  const timeLocationEl = document.createElement('span');
+  timeLocationEl.className = 'scene-header-2';
+  timeLocationEl.textContent = match ? match[3].trim() : '';
+
+  topLine.appendChild(sceneNumEl);
+  topLine.appendChild(timeLocationEl);
+  container.appendChild(topLine);
+
+  const placeText = secondLine || '';
+  if (placeText) {
+    const placeEl = document.createElement('div');
+    placeEl.className = 'scene-header-3';
+    placeEl.textContent = placeText;
+    container.appendChild(placeEl);
+  }
+
+  return container;
+}
+
+function buildDialogueElement(lines: string[]): HTMLElement {
+  const wrapper = document.createElement('div');
+  wrapper.className = 'dialogue-block';
+
+  if (lines.length === 0) {
+    return wrapper;
+  }
+
+  const [rawName, ...rest] = lines;
+  const characterEl = document.createElement('div');
+  characterEl.className = 'character';
+  characterEl.textContent = rawName.replace(/:\s*$/, '').trim();
+  wrapper.appendChild(characterEl);
+
+  rest.forEach((line) => {
+    const target = document.createElement('div');
+    if (isParenthetical(line)) {
+      target.className = 'parenthetical';
+    } else {
+      target.className = 'dialogue';
+    }
+    target.textContent = line;
+    wrapper.appendChild(target);
+  });
+
+  return wrapper;
+}
+
+function appendElement(engine: PaginationEngine, element: ScreenplayElement) {
+  switch (element.type) {
+    case 'basmala':
+      engine.appendBlock(() => {
+        const node = document.createElement('div');
+        node.className = 'basmala';
+        node.textContent = element.content;
+        return node;
+      });
+      break;
+
+    case 'scene-header':
+      engine.appendBlock(() => buildSceneHeaderElement(element.lines));
+      break;
+
+    case 'transition':
+      engine.appendBlock(() => {
+        const node = document.createElement('div');
+        node.className = 'transition';
+        node.textContent = element.content;
+        return node;
+      });
+      break;
+
+    case 'dialogue':
+      engine.appendBlock(() => buildDialogueElement(element.lines));
+      break;
+
+    case 'action':
+    default:
+      if (!element.content) {
+        engine.appendBlock(() => {
+          const placeholder = document.createElement('div');
+          placeholder.className = 'action';
+          placeholder.innerHTML = '<br />';
+          return placeholder;
+        });
+      } else if (isParenthetical(element.content)) {
+        engine.appendBlock(() => {
+          const node = document.createElement('div');
+          node.className = 'parenthetical';
+          node.textContent = element.content;
+          return node;
+        });
+      } else {
+        engine.appendTextParagraph(element.content, 'action');
+      }
+      break;
+  }
+}
 
 // Create page-based HTML structure using advanced engine
 export function createPagedHTML(content: string): string {
-  return paginationEngine.generatePaginatedHTML(content);
+  if (typeof document === 'undefined') {
+    return createSimplePagedHTML(content);
+  }
+
+  const host = document.createElement('div');
+  host.className = 'pages-host';
+  host.style.position = 'absolute';
+  host.style.visibility = 'hidden';
+  host.style.pointerEvents = 'none';
+  host.style.left = '-10000px';
+  host.style.top = '0';
+
+  document.body.appendChild(host);
+
+  try {
+    const engine = new PaginationEngine(host);
+    const elements = analyzeContent(content);
+    elements.forEach((element) => appendElement(engine, element));
+    return `<div class="pages-host">${host.innerHTML}</div>`;
+  } finally {
+    document.body.removeChild(host);
+  }
 }
 
 // Legacy simple pagination for backward compatibility
 export function createSimplePagedHTML(content: string): string {
   const pages = paginateContent(content);
+  const parts: string[] = [];
 
-  let pagedHTML = '<div class="screenplay-pages">';
+  parts.push('<div class="pages-host">');
 
-  pages.forEach((page) => {
+  pages.forEach((page, index) => {
+    if (index > 0) {
+      parts.push('<div class="page-separator"></div>');
+    }
     const pageContent = parseAndFormat(page.content);
-    pagedHTML += `
+    parts.push(`
       <div class="page" data-page="${page.pageNumber}">
+        ${HORIZONTAL_RULER_HTML}
+        ${VERTICAL_RULER_HTML}
         <div class="page-content">
           ${pageContent}
         </div>
-        <div class="page-number">${page.pageNumber}</div>
-      </div>`;
+        <div class="page-footer">${page.pageNumber}</div>
+      </div>`);
   });
 
-  pagedHTML += '</div>';
-  return pagedHTML;
+  if (pages.length === 0) {
+    parts.push(`
+      <div class="page" data-page="1">
+        ${HORIZONTAL_RULER_HTML}
+        ${VERTICAL_RULER_HTML}
+        <div class="page-content"></div>
+        <div class="page-footer">1</div>
+      </div>`);
+  }
+
+  parts.push('</div>');
+  return parts.join('');
 }

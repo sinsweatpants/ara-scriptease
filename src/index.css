@@ -200,7 +200,7 @@ body {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  margin: 0rem 0 0 0;
+  margin: 0;
   direction: rtl;
 }
 
@@ -217,16 +217,20 @@ body {
 }
 
 .scene-header-3 {
+  display: block;
+  width: 100%;
   text-align: center;
   font-weight: bold;
-  margin: 0;
+  margin: 0.2rem 0;
   font-size: 13pt;
   color: hsl(var(--foreground));
+  text-transform: uppercase;
 }
 
 .action {
+  display: block;
   text-align: right;
-  margin: 0rem 0;
+  margin: 0.15rem 0;
   color: hsl(var(--foreground));
 }
 
@@ -263,11 +267,26 @@ body {
 }
 
 .transition {
+  display: block;
+  width: 100%;
   text-align: center;
   font-weight: bold;
   text-transform: uppercase;
-  margin: 0rem 0;
+  margin: 0.2rem 0;
   color: hsl(var(--primary));
+}
+
+.character,
+.dialogue,
+.parenthetical {
+  display: block;
+  margin: 0.15rem auto;
+  text-align: center;
+  width: 2.5in;
+}
+
+.parenthetical {
+  font-style: italic;
 }
 
 .editor-container {
@@ -365,43 +384,150 @@ body {
   box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
 }
 
-/* A4 Page Specifications - Mandatory Standards */
+/* Host for all pages */
+.pages-host,
 .screenplay-pages {
+  background: #f5f5f5;
+  padding: 1rem 0;
   display: flex;
   flex-direction: column;
+  gap: 0;
   align-items: center;
-  gap: 20px;
-  background-color: transparent;
-  padding: 0;
-  min-height: auto;
+  direction: rtl;
 }
 
+/* Visual separator between pages */
+.page-separator {
+  width: 100%;
+  height: 14px;
+  background: #ffd400;
+  border-top: 3px solid #000;
+  border-bottom: 3px solid #000;
+}
+
+/* Individual A4 page */
 .page {
-  width: 210mm;  /* A4 width */
-  height: 297mm; /* A4 height */
-  background: white;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   position: relative;
+  width: 8.27in;
+  height: 11.69in;
+  background: #ffffff;
+  box-sizing: border-box;
+  padding-top: 1in;
+  padding-bottom: 1in;
+  padding-right: 1.5in;
+  padding-left: 1in;
   overflow: hidden;
-  page-break-after: always;
+  box-shadow: 0 0 0.5rem rgba(0, 0, 0, 0.1);
 }
 
+/* Measurement rulers for the top and right edges */
+.ruler-container {
+  position: absolute;
+  pointer-events: none;
+  z-index: 5;
+  font-size: 0.6rem;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-variant-numeric: tabular-nums;
+  color: #4b5563;
+  text-transform: none;
+  letter-spacing: 0.02em;
+  direction: ltr;
+}
+
+.ruler-container.horizontal {
+  top: 0;
+  right: 0;
+  left: 0;
+  height: 1.25rem;
+  border-bottom: 1px solid rgba(55, 65, 81, 0.25);
+  background-image: repeating-linear-gradient(
+    to left,
+    rgba(55, 65, 81, 0.35),
+    rgba(55, 65, 81, 0.35) 1px,
+    transparent 1px,
+    transparent calc(1cm)
+  );
+}
+
+.ruler-container.vertical {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 1.25rem;
+  border-left: 1px solid rgba(55, 65, 81, 0.25);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(55, 65, 81, 0.35),
+    rgba(55, 65, 81, 0.35) 1px,
+    transparent 1px,
+    transparent calc(1cm)
+  );
+}
+
+.ruler-number {
+  position: absolute;
+  white-space: nowrap;
+  font-weight: 600;
+}
+
+.ruler-container.horizontal .ruler-number {
+  bottom: 2px;
+}
+
+.ruler-container.vertical .ruler-number {
+  right: 4px;
+}
+
+.dark .ruler-container {
+  color: #e5e7eb;
+}
+
+.dark .ruler-container.horizontal {
+  border-bottom-color: rgba(229, 231, 235, 0.35);
+  background-image: repeating-linear-gradient(
+    to left,
+    rgba(229, 231, 235, 0.35),
+    rgba(229, 231, 235, 0.35) 1px,
+    transparent 1px,
+    transparent calc(1cm)
+  );
+}
+
+.dark .ruler-container.vertical {
+  border-left-color: rgba(229, 231, 235, 0.35);
+  background-image: repeating-linear-gradient(
+    to bottom,
+    rgba(229, 231, 235, 0.35),
+    rgba(229, 231, 235, 0.35) 1px,
+    transparent 1px,
+    transparent calc(1cm)
+  );
+}
+
+/* Writing area inside margins */
 .page-content {
-  padding: 1in 1in 1in 1.5in; /* top=1in, right=1in, bottom=1in, left=1.5in */
-  height: calc(297mm - 2in); /* A4 height minus top/bottom margins */
+  display: block;
+  position: relative;
+  padding-top: 0.01px;
+  padding-bottom: 0.01px;
+  height: calc(100% - 0.02px);
+  min-height: calc(100% - 0.02px);
   overflow: hidden;
   direction: rtl;
   box-sizing: border-box;
 }
 
-.page-number {
+/* Fixed footer for page numbers */
+.page-footer {
   position: absolute;
-  bottom: 0.5in;
-  left: 1in;
-  font-size: 10pt;
-  color: #666;
-  font-family: var(--font-arabic);
-  z-index: 10;
+  left: 0;
+  right: 0;
+  bottom: 0.45in;
+  text-align: center;
+  font-size: 11pt;
+  color: #000;
+  opacity: 0.8;
+  pointer-events: none;
 }
 
 /* Dynamic Pagination Engine Styles */
@@ -424,27 +550,24 @@ body {
 /* Responsive Design for A4 Pages */
 @media screen and (max-width: 1024px) {
   .page {
-    width: 95vw;
+    width: min(95vw, 8.27in);
     height: auto;
-    min-height: 297mm;
+    min-height: 11.69in;
   }
-  
+
   .page-content {
-    padding: 0.75in 0.75in 0.75in 1.25in;
     height: auto;
-    min-height: calc(297mm - 1.5in);
+    min-height: calc(11.69in - 2in);
+    padding-right: 1.25in;
+    padding-left: 0.85in;
   }
-  
-  .character-name {
-    width: 2.2in;
-  }
-  
-  .parenthetical {
-    width: 1.8in;
-  }
-  
+
+  .character,
+  .dialogue,
+  .parenthetical,
+  .character-name,
   .dialogue-text {
-    width: 2.2in;
+    width: min(2.5in, 70%);
   }
 }
 
@@ -452,37 +575,30 @@ body {
   .page {
     width: 98vw;
   }
-  
+
   .page-content {
-    padding: 0.5in 0.5in 0.5in 1in;
+    padding-right: 1in;
+    padding-left: 0.75in;
   }
-  
-  .character-name {
-    width: 2in;
-  }
-  
-  .parenthetical {
-    width: 1.5in;
-  }
-  
+
+  .character,
+  .dialogue,
+  .parenthetical,
+  .character-name,
   .dialogue-text {
-    width: 2in;
+    width: min(2.3in, 80%);
   }
 }
 
 @media screen and (max-width: 480px) {
   .page-content {
-    padding: 0.25in;
+    padding: 0.5in 0.5in 0.5in 0.75in;
   }
-  
-  .character-name {
-    width: 90%;
-  }
-  
-  .parenthetical {
-    width: 85%;
-  }
-  
+
+  .character,
+  .dialogue,
+  .parenthetical,
+  .character-name,
   .dialogue-text {
     width: 90%;
   }
@@ -494,33 +610,35 @@ body {
     background: white;
     padding: 0;
   }
-  
+
   .page {
-    width: 210mm !important;
-    height: 297mm !important;
+    width: 8.27in !important;
+    height: 11.69in !important;
     margin: 0;
     box-shadow: none;
     page-break-after: always;
   }
-  
+
   .page-content {
-    padding: 1in 1in 1in 1.5in !important;
-    height: calc(297mm - 2in) !important;
+    padding-top: 0.01px !important;
+    padding-bottom: 0.01px !important;
+    height: calc(100% - 0.02px) !important;
   }
-  
+
   .page:last-child {
     page-break-after: avoid;
   }
-  
+
   .toolbar {
     display: none;
   }
-  
+
+  .pages-host,
   .screenplay-pages {
     gap: 0;
   }
-  
-  .page-number {
+
+  .page-footer {
     print-color-adjust: exact;
   }
 }
