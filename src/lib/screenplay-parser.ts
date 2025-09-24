@@ -9,7 +9,7 @@ function escapeHtml(text: string): string {
 import { formatStyles } from './dialogue-detector';
 import { SceneHeaderExtractor } from './scene-header-extractor';
 import { analyzeContent, type ScreenplayElement } from './pagination-engine';
-import { PaginationEngine } from './PaginationEngine';
+import { PaginationEngine } from './dom-pagination-engine';
 import { HORIZONTAL_RULER_HTML, VERTICAL_RULER_HTML } from './ruler';
 import type { CSSProperties } from 'react';
 
