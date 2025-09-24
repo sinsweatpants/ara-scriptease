@@ -46,6 +46,19 @@ function isTransition(line: string): boolean {
   return transitionPatterns.some(pattern => pattern.test(line));
 }
 
+// Helper function to detect if a line is likely an action
+function isLikelyAction(line: string): boolean {
+    const actionIndicators = [
+      'يسير', 'تسير', 'يمشي', 'تمشي', 'يجري', 'تجري',
+      'يجلس', 'تجلس', 'يقف', 'تقف', 'ينظر', 'تنظر',
+      'يفتح', 'تفتح', 'يغلق', 'تغلق', 'يدخل', 'تدخل',
+      'يخرج', 'تخرج', 'يضع', 'تضع', 'يأخذ', 'تأخذ',
+      'تخرج', 'يدخل', 'تلتفت', 'ينظر', 'ترقد', 'تقف'
+    ];
+    const trimmedLine = line.trim();
+    return actionIndicators.some(indicator => trimmedLine.startsWith(indicator));
+}
+
 // Enhanced Arabic screenplay parser with improved pattern recognition
 export function parseAndFormat(text: string): string {
   if (!text) return '';
@@ -92,23 +105,29 @@ export function parseAndFormat(text: string): string {
           place = restOfLine;
         }
         
-        // Check if place is on the next line
-        if (!place && i + 1 < lines.length && lines[i + 1].trim() && 
-            !lines[i + 1].trim().match(/^(مشهد|م\.)\s*(\d+)/i) &&
-            !isCharacterName(lines[i + 1].trim()) &&
-            !isTransition(lines[i + 1].trim())) {
-          i++;
-          place = lines[i].trim();
+        // Keep consuming lines as part of the header if they don't look like something else
+        while (i + 1 < lines.length) {
+          const nextLine = lines[i + 1].trim();
+          // Heuristic to decide if the next line is part of the header
+          if (nextLine && !isCharacterName(nextLine) && !isTransition(nextLine) && !isLikelyAction(nextLine) && !nextLine.match(/^(مشهد|م\.)/i) && !nextLine.startsWith('(')) {
+            i++;
+            place += (place ? ' - ' : '') + lines[i].trim();
+          } else {
+            break;
+          }
         }
         
+        const sceneHeaderContainerStyle = styleObjectToString(formatStyles['scene-header-container']);
         const sceneHeaderTopLineStyle = styleObjectToString(formatStyles['scene-header-top-line']);
+        const sceneHeader1Style = styleObjectToString(formatStyles['scene-header-1']);
+        const sceneHeader2Style = styleObjectToString(formatStyles['scene-header-2']);
         const sceneHeader3Style = styleObjectToString(formatStyles['scene-header-3']);
 
         formattedHTML += `
-          <div>
+          <div style="${sceneHeaderContainerStyle}">
             <div style="${sceneHeaderTopLineStyle}">
-              <span>${escapeHtml(sceneNum)}</span>
-              <span>${escapeHtml(timeLocation)}</span>
+              <span style="${sceneHeader1Style}">${escapeHtml(sceneNum)}</span>
+              <span style="${sceneHeader2Style}">${escapeHtml(timeLocation)}</span>
             </div>
             <div style="${sceneHeader3Style}">${escapeHtml(place)}</div>
           </div>`;
@@ -122,12 +141,13 @@ export function parseAndFormat(text: string): string {
       const dialogueBlock = DialogueDetector.extractDialogueBlock(lines, i);
       
       if (dialogueBlock) {
+        const dialogueContainerStyle = styleObjectToString(formatStyles['dialogue-container']);
         const characterStyle = styleObjectToString(formatStyles.character);
         const parentheticalStyle = styleObjectToString(formatStyles.parenthetical);
         const dialogueStyle = styleObjectToString(formatStyles.dialogue);
 
         // Generate HTML for the complete dialogue block
-        let dialogueHTML = '<div>';
+        let dialogueHTML = `<div style="${dialogueContainerStyle}">`;
         dialogueHTML += `<div style="${characterStyle}">${escapeHtml(dialogueBlock.characterName)}</div>`;
         
         // Add parentheticals first

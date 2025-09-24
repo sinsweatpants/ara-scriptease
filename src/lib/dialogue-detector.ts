@@ -12,14 +12,18 @@ export interface DialogueBlock {
 }
 
 export const formatStyles: { [key: string]: CSSProperties } = {
-    basmala: { textAlign: 'left', margin: '0 0 2rem 0', fontWeight: 'bold' },
+    basmala: { textAlign: 'left', margin: '0 0 2rem 0', fontWeight: 'bold', fontSize: '18pt' },
+    'scene-header-container': { width: '100%', marginBottom: '20px', padding: '10px', backgroundColor: '#f0f0f0', borderRadius: '6px' },
     'scene-header-top-line': { display: 'flex', justifyContent: 'space-between', width: '100%', margin: '0rem 0 0 0' },
-    'scene-header-3': { textAlign: 'center', fontWeight: 'bold', margin: '0' },
-    action: { textAlign: 'right', margin: '0rem 0' },
-    character: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0rem auto 0 auto', width: '2.5in' },
-    parenthetical: { textAlign: 'center', fontStyle: 'italic', margin: '0 auto', width: '2.0in' },
-    dialogue: { textAlign: 'center', margin: '0 auto 0.3rem auto', width: '2.5in', lineHeight: '1.2' },
-    transition: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0rem 0' }
+    'scene-header-1': { fontWeight: 'bold', fontSize: '16pt' },
+    'scene-header-2': { fontWeight: 'normal', fontSize: '14pt', color: '#666' },
+    'scene-header-3': { textAlign: 'center', fontWeight: 'bold', margin: '4px 0 0 0', fontSize: '13pt', fontStyle: 'italic' },
+    action: { textAlign: 'right', margin: '12px 0', direction: 'rtl' },
+    'dialogue-container': { margin: '15px 0', textAlign: 'center' },
+    character: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0 auto 8px auto', width: '180px', display: 'block' },
+    parenthetical: { textAlign: 'center', fontStyle: 'italic', margin: '0 auto 4px auto', width: '144px', fontSize: '11pt', display: 'block' },
+    dialogue: { textAlign: 'center', margin: '0 auto 4px auto', width: '180px', lineHeight: '1.2', display: 'block' },
+    transition: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '20px 0' }
 };
 
 export class DialogueDetector {
@@ -36,8 +40,10 @@ export class DialogueDetector {
       return true;
     }
     
-    // Secondary pattern: short Arabic name without common words
-    if (trimmed.length <= 25 && 
+    // Secondary pattern: short Arabic name without common words, stricter conditions
+    const wordCount = trimmed.split(/\s+/).filter(w => w.length > 0).length;
+    if (wordCount <= 3 && // Max 3 words for a character name
+        trimmed.length <= 30 && 
         trimmed.match(/^[\u0600-\u06FF\s]+$/) !== null &&
         !this.containsCommonWords(trimmed) &&
         !this.isLikelyAction(trimmed)) {
@@ -53,7 +59,8 @@ export class DialogueDetector {
       'في', 'على', 'من', 'إلى', 'عند', 'مع', 'بعد', 'قبل', 'أمام', 'خلف',
       'يقول', 'تقول', 'يفعل', 'تفعل', 'يذهب', 'تذهب', 'يأتي', 'تأتي',
       'الذي', 'التي', 'هذا', 'هذه', 'ذلك', 'تلك', 'كان', 'كانت',
-      'يسير', 'تسير', 'يجلس', 'تجلس', 'يقف', 'تقف', 'ينظر', 'تنظر'
+      'يسير', 'تسير', 'يجلس', 'تجلس', 'يقف', 'تقف', 'ينظر', 'تنظر',
+      'أهلاً', 'مرحباً', 'نعم', 'لا', 'حسناً'
     ];
     
     return commonWords.some(word => line.includes(word));
@@ -65,10 +72,11 @@ export class DialogueDetector {
       'يسير', 'تسير', 'يمشي', 'تمشي', 'يجري', 'تجري',
       'يجلس', 'تجلس', 'يقف', 'تقف', 'ينظر', 'تنظر',
       'يفتح', 'تفتح', 'يغلق', 'تغلق', 'يدخل', 'تدخل',
-      'يخرج', 'تخرج', 'يضع', 'تضع', 'يأخذ', 'تأخذ'
+      'يخرج', 'تخرج', 'يضع', 'تضع', 'يأخذ', 'تأخذ',
+      'تخرج', 'يدخل', 'تلتفت', 'ينظر', 'ترقد'
     ];
     
-    return actionIndicators.some(indicator => line.includes(indicator));
+    return actionIndicators.some(indicator => line.trim().startsWith(indicator));
   }
   
   // Extract complete dialogue block
