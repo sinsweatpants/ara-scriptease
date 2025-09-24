@@ -178,8 +178,8 @@
 }
 
 .dialogue-block {
-  margin-left: 2.5in;
-  margin-right: 2.5in;
+  margin-left: 20%;
+  margin-right: 20%;
   text-align: center;
   background: hsl(var(--accent));
   padding: 15px;
@@ -251,4 +251,143 @@
 .file-drop-zone.drag-over {
   border-color: hsl(var(--primary));
   background: hsl(var(--accent));
+}
+
+/* A4 Page Specifications - Mandatory Standards */
+.screenplay-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  background-color: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.page {
+  width: 210mm;  /* A4 width */
+  height: 297mm; /* A4 height */
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+.page-content {
+  padding: 1in 1in 1in 1.5in; /* top=1in, right=1in, bottom=1in, left=1.5in */
+  height: calc(297mm - 2in); /* A4 height minus top/bottom margins */
+  overflow: hidden;
+  direction: rtl;
+  box-sizing: border-box;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 0.5in;
+  left: 1in;
+  font-size: 10pt;
+  color: #666;
+  font-family: var(--font-arabic);
+  z-index: 10;
+}
+
+/* Dynamic Pagination Engine Styles */
+.page-overflow-indicator {
+  position: absolute;
+  bottom: 1in;
+  right: 1.5in;
+  background: rgba(255, 0, 0, 0.1);
+  border: 1px dashed red;
+  padding: 2px 4px;
+  font-size: 8pt;
+  color: red;
+  display: none;
+}
+
+.page.overflow .page-overflow-indicator {
+  display: block;
+}
+
+/* Responsive Design for A4 Pages */
+@media screen and (max-width: 1024px) {
+  .page {
+    width: 95vw;
+    height: auto;
+    min-height: 297mm;
+  }
+  
+  .page-content {
+    padding: 0.75in 0.75in 0.75in 1.25in;
+    height: auto;
+    min-height: calc(297mm - 1.5in);
+  }
+  
+  .dialogue-block {
+    margin-left: 15%;
+    margin-right: 15%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .page {
+    width: 98vw;
+  }
+  
+  .page-content {
+    padding: 0.5in 0.5in 0.5in 1in;
+  }
+  
+  .dialogue-block {
+    margin-left: 10%;
+    margin-right: 10%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .page-content {
+    padding: 0.25in;
+  }
+  
+  .dialogue-block {
+    margin-left: 5%;
+    margin-right: 5%;
+  }
+}
+
+/* Print Styles - A4 Compliance */
+@media print {
+  .screenplay-container {
+    background: white;
+    padding: 0;
+  }
+  
+  .page {
+    width: 210mm !important;
+    height: 297mm !important;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+  
+  .page-content {
+    padding: 1in 1in 1in 1.5in !important;
+    height: calc(297mm - 2in) !important;
+  }
+  
+  .page:last-child {
+    page-break-after: avoid;
+  }
+  
+  .toolbar {
+    display: none;
+  }
+  
+  .screenplay-pages {
+    gap: 0;
+  }
+  
+  .page-number {
+    print-color-adjust: exact;
+  }
 }

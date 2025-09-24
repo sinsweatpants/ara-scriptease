@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Save, Download } from "lucide-react";
-import ScreenplayEditorComponent from "@/components/screenplay/editor";
+import UnifiedEditor from "@/components/screenplay/unified-editor";
 import Sidebar from "@/components/screenplay/sidebar";
 import StatusBar from "@/components/screenplay/status-bar";
 import { useToast } from "@/hooks/use-toast";
@@ -109,7 +109,7 @@ export default function ScreenplayEditor() {
           {/* Main Editor */}
           <div className="lg:col-span-3">
             <Card className="overflow-hidden">
-              <ScreenplayEditorComponent 
+              <UnifiedEditor 
                 content={content}
                 onContentChange={updateStats}
               />

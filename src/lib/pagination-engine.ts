@@ -30,15 +30,16 @@ export class PaginationEngine {
 
   constructor(dimensions?: Partial<PageDimensions>) {
     this.dimensions = {
-      width: 612, // 8.5 inches * 72 points/inch
-      height: 792, // 11 inches * 72 points/inch
-      marginTop: 72, // 1 inch
-      marginBottom: 72, // 1 inch
-      marginLeft: 108, // 1.5 inches
-      marginRight: 72, // 1 inch
+      width: 595, // A4 width: 210mm * 2.83 points/mm
+      height: 842, // A4 height: 297mm * 2.83 points/mm
+      marginTop: 72, // 1 inch = 72 points
+      marginBottom: 72, // 1 inch = 72 points
+      marginLeft: 108, // 1.5 inches = 108 points
+      marginRight: 72, // 1 inch = 72 points
       ...dimensions
     };
     
+    // Calculate available content height (A4 height minus top/bottom margins)
     this.maxPageHeight = this.dimensions.height - this.dimensions.marginTop - this.dimensions.marginBottom;
   }
 
@@ -71,7 +72,7 @@ export class PaginationEngine {
       }
       
       // Scene header detection
-      else if (line.match(/^(مشهد|م\.)\\s*\\d+/i)) {
+      else if (line.match(/^(مشهد|م\.)\s*\d+/i)) {
         let sceneContent = line;
         let lineCount = 1;
         
@@ -156,14 +157,14 @@ export class PaginationEngine {
     };
 
     for (const element of elements) {
-      // Check if element fits on current page
-      if (currentPage.height + element.estimatedHeight > this.maxPageHeight && 
-          currentPage.elements.length > 0) {
-        
-        // Mark current page as complete
+      // Dynamic pagination with A4 compliance
+      const willOverflow = currentPage.height + element.estimatedHeight > this.maxPageHeight;
+      
+      if (willOverflow && currentPage.elements.length > 0) {
+        // Complete current page and start new one
         pages.push(currentPage);
         
-        // Start new page
+        // Create new page with mandatory A4 margins
         currentPage = {
           pageNumber: pages.length + 1,
           elements: [element],
@@ -174,6 +175,11 @@ export class PaginationEngine {
         // Add element to current page
         currentPage.elements.push(element);
         currentPage.height += element.estimatedHeight;
+        
+        // Mark overflow if approaching limit
+        if (currentPage.height > this.maxPageHeight * 0.95) {
+          currentPage.overflow = true;
+        }
       }
     }
 
@@ -198,7 +204,8 @@ export class PaginationEngine {
     let html = '<div class="screenplay-pages">';
     
     for (const page of pages) {
-      html += `<div class="page" data-page="${page.pageNumber}">`;
+      const overflowClass = page.overflow ? ' overflow' : '';
+      html += `<div class="page${overflowClass}" data-page="${page.pageNumber}">`;
       html += '<div class="page-content">';
       
       for (const element of page.elements) {
@@ -207,6 +214,12 @@ export class PaginationEngine {
       
       html += '</div>';
       html += `<div class="page-number">${page.pageNumber}</div>`;
+      
+      // Add overflow indicator if needed
+      if (page.overflow) {
+        html += '<div class="page-overflow-indicator">تجاوز الصفحة</div>';
+      }
+      
       html += '</div>';
     }
     
@@ -245,7 +258,7 @@ export class PaginationEngine {
     const firstLine = lines[0];
     const secondLine = lines[1] || '';
     
-    const sceneMatch = firstLine.match(/^(مشهد|م\.)\\s*(\\d+)\\s*[-–—]?\\s*(.*)/i);
+    const sceneMatch = firstLine.match(/^(مشهد|م\.)\s*(\d+)\s*[-–—]?\s*(.*)/i);
     if (sceneMatch) {
       const sceneNum = `${sceneMatch[1]} ${sceneMatch[2]}`;
       const timeLocation = sceneMatch[3] || '';
@@ -288,21 +301,17 @@ export class PaginationEngine {
 
   // Helper methods
   private isCharacterName(line: string): boolean {
-    return (
-      line.match(/^[أ-ي\\s]+:$/) !== null ||
-      (line === line.toUpperCase() && line.match(/^[أ-ي\\s]+$/) !== null) ||
-      line.match(/^[أ-ي][أ-ي\\s]{1,20}$/) !== null
-    );
+    return line.match(/^[أ-ي\s]+:$/) !== null;
   }
 
   private isParenthetical(line: string): boolean {
-    return line.match(/^\\(.+\\)$/) !== null;
+    return line.match(/^\(.*\)$/) !== null;
   }
 
   private isTransition(line: string): boolean {
     const patterns = [
-      /قطع\\s+إلى/i, /انتقال\\s+إلى/i, /قطع\\./i, /انتقال/i,
-      /فيد\\s+إلى/i, /فيد\\s+من/i, /تلاشي\\s+إلى/i, /ذوبان\\s+إلى/i,
+      /قطع\s+إلى/i, /انتقال\s+إلى/i, /قطع\./i, /انتقال/i,
+      /فيد\s+إلى/i, /فيد\s+من/i, /تلاشي\s+إلى/i, /ذوبان\s+إلى/i,
       /انتهاء/i, /النهاية/i
     ];
     return patterns.some(pattern => pattern.test(line));
@@ -310,7 +319,7 @@ export class PaginationEngine {
 
   private isNewElement(line: string): boolean {
     return (
-      line.match(/^(مشهد|م\.)\\s*\\d+/i) !== null ||
+      line.match(/^(مشهد|م\.)\s*\d+/i) !== null ||
       this.isTransition(line) ||
       this.isCharacterName(line) ||
       line.includes('بسم الله الرحمن الرحيم')

@@ -5,21 +5,20 @@ function escapeHtml(text: string): string {
   return div.innerHTML;
 }
 
-// Helper function to detect character names
+// Import advanced dialogue detector
+import DialogueDetector from './dialogue-detector';
+
+// Helper function to detect character names - محسن باستخدام كاشف الحوار
 function isCharacterName(line: string): boolean {
-  return (
-    line.match(/^[أ-ي\s]+:$/) !== null ||
-    (line === line.toUpperCase() && line.match(/^[أ-ي\s]+$/) !== null) ||
-    line.match(/^[أ-ي][أ-ي\s]{1,20}$/) !== null
-  );
+  return DialogueDetector.isCharacterName(line);
 }
 
-// Helper function to detect parenthetical (stage directions)
+// Helper function to detect parenthetical (stage directions) - محسن للنصوص الإرشادية
 function isParenthetical(line: string): boolean {
-  return line.match(/^\(.+\)$/) !== null;
+  return line.match(/^\(.*\)$/) !== null;
 }
 
-// Helper function to detect transitions
+// Helper function to detect transitions - محسن لمؤشرات الانتقال
 function isTransition(line: string): boolean {
   const transitionPatterns = [
     /قطع\s+إلى/i,
@@ -59,8 +58,8 @@ export function parseAndFormat(text: string): string {
       formattedHTML += `<div class="basmala">${escapeHtml(line)}</div>`;
     }
     
-    // 2. Scene header detection - رأس المشهد
-    else if (line.match(/^(مشهد|م\.)\s*\d+/i)) {
+    // 2. Scene header detection - رأس المشهد (محسن)
+    else if (line.match(/^(مشهد|م\.)\s*(\d+)\s*[-–—]?\s*(.*)/i)) {
       const sceneHeaderMatch = line.match(/^(مشهد|م\.)\s*(\d+)\s*[-–—]?\s*(.*)/i);
       if (sceneHeaderMatch) {
         const sceneNum = `${sceneHeaderMatch[1]} ${sceneHeaderMatch[2]}`;
@@ -80,8 +79,9 @@ export function parseAndFormat(text: string): string {
         
         // Check if place is on the next line
         if (!place && i + 1 < lines.length && lines[i + 1].trim() && 
-            !lines[i + 1].trim().match(/^(مشهد|م\.)\s*\d+/i) &&
-            !isCharacterName(lines[i + 1].trim())) {
+            !lines[i + 1].trim().match(/^(مشهد|م\.)\s*(\d+)/i) &&
+            !isCharacterName(lines[i + 1].trim()) &&
+            !isTransition(lines[i + 1].trim())) {
           i++;
           place = lines[i].trim();
         }
@@ -102,34 +102,35 @@ export function parseAndFormat(text: string): string {
       formattedHTML += `<div class="transition">${escapeHtml(line)}</div>`;
     }
     
-    // 4. Character name and dialogue block detection - الكتلة الحوارية
+    // 4. Character name and dialogue block detection - الكتلة الحوارية (محسن)
     else if (isCharacterName(line)) {
-      let dialogueBlock = `<div class="dialogue-block">`;
-      dialogueBlock += `<div class="character-name">${escapeHtml(line.replace(':', ''))}</div>`;
+      // Use advanced dialogue detector
+      const dialogueBlock = DialogueDetector.extractDialogueBlock(lines, i);
       
-      // Check for parenthetical (stage directions) in next line
-      if (i + 1 < lines.length && isParenthetical(lines[i + 1].trim())) {
-        i++;
-        dialogueBlock += `<div class="parenthetical">${escapeHtml(lines[i].trim())}</div>`;
-      }
-      
-      // Collect dialogue text from subsequent lines
-      while (i + 1 < lines.length && lines[i + 1].trim() && 
-             !lines[i + 1].trim().match(/^(مشهد|م\.)\s*\d+/i) &&
-             !isTransition(lines[i + 1].trim()) &&
-             !isCharacterName(lines[i + 1].trim())) {
-        i++;
-        const dialogueLine = lines[i].trim();
+      if (dialogueBlock) {
+        // Generate HTML for the complete dialogue block
+        let dialogueHTML = '<div class="dialogue-block">';
+        dialogueHTML += `<div class="character-name">${escapeHtml(dialogueBlock.characterName)}</div>`;
         
-        if (isParenthetical(dialogueLine)) {
-          dialogueBlock += `<div class="parenthetical">${escapeHtml(dialogueLine)}</div>`;
-        } else {
-          dialogueBlock += `<div class="dialogue-text">${escapeHtml(dialogueLine)}</div>`;
+        // Add parentheticals first
+        for (const parenthetical of dialogueBlock.parentheticals) {
+          dialogueHTML += `<div class="parenthetical">${escapeHtml(parenthetical)}</div>`;
         }
+        
+        // Add dialogue lines
+        for (const dialogueLine of dialogueBlock.dialogueLines) {
+          dialogueHTML += `<div class="dialogue-text">${escapeHtml(dialogueLine)}</div>`;
+        }
+        
+        dialogueHTML += '</div>';
+        formattedHTML += dialogueHTML;
+        
+        // Skip to the end of the dialogue block
+        i = dialogueBlock.endIndex;
+      } else {
+        // Fallback to treating as action if dialogue detection fails
+        formattedHTML += `<div class="action">${escapeHtml(line)}</div>`;
       }
-      
-      dialogueBlock += `</div>`;
-      formattedHTML += dialogueBlock;
     }
     
     // 3. Default to action - السرد الحركي
