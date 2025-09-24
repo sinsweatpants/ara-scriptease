@@ -1,0 +1,351 @@
+@import url('https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(222.2, 84%, 4.9%);
+  --card: hsl(0, 0%, 100%);
+  --card-foreground: hsl(222.2, 84%, 4.9%);
+  --popover: hsl(0, 0%, 100%);
+  --popover-foreground: hsl(222.2, 84%, 4.9%);
+  --primary: hsl(221.2, 83.2%, 53.3%);
+  --primary-foreground: hsl(210, 40%, 98%);
+  --secondary: hsl(210, 40%, 96%);
+  --secondary-foreground: hsl(222.2, 84%, 4.9%);
+  --muted: hsl(210, 40%, 96%);
+  --muted-foreground: hsl(215.4, 16.3%, 46.9%);
+  --accent: hsl(210, 40%, 96%);
+  --accent-foreground: hsl(222.2, 84%, 4.9%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(214.3, 31.8%, 91.4%);
+  --input: hsl(214.3, 31.8%, 91.4%);
+  --ring: hsl(221.2, 83.2%, 53.3%);
+  --chart-1: hsl(203.8863, 88.2845%, 53.1373%);
+  --chart-2: hsl(159.7826, 100%, 36.0784%);
+  --chart-3: hsl(42.0290, 92.8251%, 56.2745%);
+  --chart-4: hsl(147.1429, 78.5047%, 41.9608%);
+  --chart-5: hsl(341.4894, 75.2000%, 50.9804%);
+  --sidebar: hsl(180, 6.6667%, 97.0588%);
+  --sidebar-foreground: hsl(210, 25%, 7.8431%);
+  --sidebar-primary: hsl(203.8863, 88.2845%, 53.1373%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(211.5789, 51.3514%, 92.7451%);
+  --sidebar-accent-foreground: hsl(203.8863, 88.2845%, 53.1373%);
+  --sidebar-border: hsl(205.0000, 25.0000%, 90.5882%);
+  --sidebar-ring: hsl(202.8169, 89.1213%, 53.1373%);
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --font-arabic: Amiri, serif;
+  --radius: 0.5rem;
+  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-sm: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-md: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 2px 4px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-lg: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 4px 6px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 8px 10px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --tracking-normal: 0em;
+  --spacing: 0.25rem;
+}
+
+.dark {
+  --background: hsl(0, 0%, 0%);
+  --foreground: hsl(200, 6.6667%, 91.1765%);
+  --card: hsl(228, 9.8039%, 10%);
+  --card-foreground: hsl(0, 0%, 85.0980%);
+  --popover: hsl(0, 0%, 0%);
+  --popover-foreground: hsl(200, 6.6667%, 91.1765%);
+  --primary: hsl(203.7736, 87.6033%, 52.5490%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --secondary: hsl(195.0000, 15.3846%, 94.9020%);
+  --secondary-foreground: hsl(210, 25%, 7.8431%);
+  --muted: hsl(0, 0%, 9.4118%);
+  --muted-foreground: hsl(210, 3.3898%, 46.2745%);
+  --accent: hsl(205.7143, 70%, 7.8431%);
+  --accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
+  --destructive-foreground: hsl(0, 0%, 100%);
+  --border: hsl(210, 5.2632%, 14.9020%);
+  --input: hsl(207.6923, 27.6596%, 18.4314%);
+  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+  --chart-1: hsl(203.8863, 88.2845%, 53.1373%);
+  --chart-2: hsl(159.7826, 100%, 36.0784%);
+  --chart-3: hsl(42.0290, 92.8251%, 56.2745%);
+  --chart-4: hsl(147.1429, 78.5047%, 41.9608%);
+  --chart-5: hsl(341.4894, 75.2000%, 50.9804%);
+  --sidebar: hsl(228, 9.8039%, 10%);
+  --sidebar-foreground: hsl(0, 0%, 85.0980%);
+  --sidebar-primary: hsl(202.8169, 89.1213%, 53.1373%);
+  --sidebar-primary-foreground: hsl(0, 0%, 100%);
+  --sidebar-accent: hsl(205.7143, 70%, 7.8431%);
+  --sidebar-accent-foreground: hsl(203.7736, 87.6033%, 52.5490%);
+  --sidebar-border: hsl(205.7143, 15.7895%, 26.0784%);
+  --sidebar-ring: hsl(202.8169, 89.1213%, 53.1373%);
+  --font-sans: Open Sans, sans-serif;
+  --font-serif: Georgia, serif;
+  --font-mono: Menlo, monospace;
+  --font-arabic: Amiri, serif;
+  --radius: 0.5rem;
+  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-xs: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-sm: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 1px 2px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-md: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 2px 4px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-lg: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 4px 6px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00), 0px 8px 10px -1px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169, 89.1213%, 53.1373%, 0.00);
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply font-sans antialiased bg-background text-foreground;
+    font-family: var(--font-arabic), var(--font-sans);
+  }
+}
+
+/* Advanced Arabic Screenplay Formatting System */
+
+/* Page-Based Layout System */
+.screenplay-container {
+  direction: rtl;
+  font-family: var(--font-arabic), 'Times New Roman', serif;
+  font-size: 12pt;
+  line-height: 1.5;
+  background-color: #f5f5f5;
+  padding: 20px;
+  min-height: 100vh;
+}
+
+.screenplay-pages {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.page {
+  width: 8.5in;
+  height: 11in;
+  background: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  position: relative;
+  overflow: hidden;
+  page-break-after: always;
+}
+
+.page-content {
+  padding: 1in 1in 1in 1.5in;
+  height: calc(11in - 2in);
+  overflow: hidden;
+  direction: rtl;
+}
+
+.page-number {
+  position: absolute;
+  bottom: 0.5in;
+  left: 1in;
+  font-size: 10pt;
+  color: #666;
+  font-family: var(--font-arabic);
+}
+
+/* 1. Basmala - البسملة */
+.basmala {
+  text-align: center;
+  font-weight: bold;
+  font-size: 18pt;
+  margin: 20px 0;
+  direction: rtl;
+  color: hsl(var(--primary));
+}
+
+/* 2. Scene Header - رأس المشهد */
+.scene-header-container {
+  width: 100%;
+  overflow: hidden;
+  margin-bottom: 20px;
+  direction: rtl;
+  background: hsl(var(--muted));
+  padding: 10px;
+  border-radius: 6px;
+}
+
+.scene-header-top-line {
+  width: 100%;
+  display: block;
+  overflow: hidden;
+}
+
+.scene-header-1 {
+  font-weight: bold;
+  font-size: 16pt;
+  float: right;
+  margin: 0 10px;
+  color: hsl(var(--primary));
+}
+
+.scene-header-2 {
+  font-weight: normal;
+  font-size: 14pt;
+  float: left;
+  margin: 0 10px;
+  color: hsl(var(--muted-foreground));
+}
+
+.scene-header-3 {
+  text-align: center;
+  font-size: 13pt;
+  font-style: italic;
+  margin-top: 4px;
+  margin-bottom: 12px;
+  clear: both;
+  color: hsl(var(--foreground));
+}
+
+/* 3. Action - السرد الحركي */
+.action {
+  text-align: right;
+  margin: 12px 0;
+  direction: rtl;
+  color: hsl(var(--foreground));
+}
+
+/* 4. Dialogue Block - الكتلة الحوارية */
+.dialogue-block {
+  margin-left: 2.5in;
+  margin-right: 2.5in;
+  text-align: center;
+  margin: 15px 0;
+  direction: rtl;
+  background: hsl(var(--accent));
+  padding: 15px;
+  border-radius: 6px;
+}
+
+.character-name {
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+  color: hsl(var(--primary));
+}
+
+.parenthetical {
+  font-style: italic;
+  margin-bottom: 4px;
+  font-size: 11pt;
+  color: hsl(var(--muted-foreground));
+}
+
+.dialogue-text {
+  text-align: center;
+  margin-bottom: 2px;
+  color: hsl(var(--foreground));
+}
+
+/* 5. Transition - مؤشرات الانتقال */
+.transition {
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin: 20px 0;
+  direction: rtl;
+  color: hsl(var(--primary));
+}
+
+/* Editor Container */
+.editor-container {
+  border: none;
+  outline: none;
+  min-height: 600px;
+  background: hsl(var(--background));
+  direction: rtl;
+}
+
+.editor-container:focus {
+  outline: none;
+}
+
+/* Toolbar */
+.toolbar {
+  background: hsl(var(--card));
+  border-bottom: 1px solid hsl(var(--border));
+  padding: 8px 16px;
+  margin-bottom: 16px;
+  border-radius: 8px 8px 0 0;
+}
+
+.file-drop-zone {
+  border: 2px dashed hsl(var(--border));
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.file-drop-zone:hover {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--muted));
+}
+
+.file-drop-zone.drag-over {
+  border-color: hsl(var(--primary));
+  background: hsl(var(--accent));
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .page {
+    width: 95%;
+    height: auto;
+    min-height: 11in;
+  }
+  
+  .page-content {
+    padding: 0.5in;
+    height: auto;
+    min-height: calc(11in - 1in);
+  }
+  
+  .dialogue-block {
+    margin-left: 1in;
+    margin-right: 1in;
+  }
+}
+
+/* Print Styles */
+@media print {
+  .screenplay-container {
+    background: white;
+    padding: 0;
+  }
+  
+  .page {
+    width: 8.5in;
+    height: 11in;
+    margin: 0;
+    box-shadow: none;
+    page-break-after: always;
+  }
+  
+  .page:last-child {
+    page-break-after: avoid;
+  }
+  
+  .toolbar {
+    display: none;
+  }
+  
+  .screenplay-pages {
+    gap: 0;
+  }
+}
