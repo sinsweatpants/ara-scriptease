@@ -97,12 +97,8 @@ export function parseAndFormat(text: string): string {
       }
     }
     
-    // 5. Transition detection - مؤشرات الانتقال
-    else if (isTransition(line)) {
-      formattedHTML += `<div class="transition">${escapeHtml(line)}</div>`;
-    }
-    
-    // 4. Character name and dialogue block detection - الكتلة الحوارية (محسن)
+    // 4. Character name and dialogue block detection (PRIORITIZED)
+    // 4. الكشف عن اسم الشخصية وكتلة الحوار (أولوية التنفيذ)
     else if (isCharacterName(line)) {
       // Use advanced dialogue detector
       const dialogueBlock = DialogueDetector.extractDialogueBlock(lines, i);
@@ -133,7 +129,13 @@ export function parseAndFormat(text: string): string {
       }
     }
     
-    // 3. Default to action - السرد الحركي
+    // 5. Transition detection - مؤشرات الانتقال
+    else if (isTransition(line)) {
+      formattedHTML += `<div class="transition">${escapeHtml(line)}</div>`;
+    }
+    
+    // 3. Default to action (LAST RESORT)
+    // 3. الافتراضي هو السرد الحركي (الحل الأخير)
     else {
       formattedHTML += `<div class="action">${escapeHtml(line)}</div>`;
     }

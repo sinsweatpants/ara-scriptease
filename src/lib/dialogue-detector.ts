@@ -15,14 +15,15 @@ export class DialogueDetector {
   static isCharacterName(line: string): boolean {
     const trimmed = line.trim();
     
-    // Primary pattern: name followed by colon
-    if (trimmed.match(/^[أ-ي\s]+:$/) !== null) {
+    // Primary pattern: Arabic name followed by a colon (UPDATED)
+    // النمط الأساسي: اسم عربي متبوع بنقطتين رأسيتين (تحديث)
+    if (trimmed.match(/^[\u0600-\u06FF\s]+[:|：]$/) !== null) {
       return true;
     }
     
     // Secondary pattern: short Arabic name without common words
     if (trimmed.length <= 25 && 
-        trimmed.match(/^[أ-ي\s]+$/) !== null &&
+        trimmed.match(/^[\u0600-\u06FF\s]+$/) !== null &&
         !this.containsCommonWords(trimmed) &&
         !this.isLikelyAction(trimmed)) {
       return true;
