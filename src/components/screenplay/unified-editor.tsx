@@ -1,8 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { AlignLeft, Undo, Redo, FileText, Layers } from "lucide-react";
-import { parseAndFormat, createPagedHTML } from "@/lib/screenplay-parser";
-import { textFlowMonitor } from "@/lib/text-flow-monitor";
+import { parseAndFormat } from "@/lib/screenplay-parser";
 import { useToast } from "@/hooks/use-toast";
 
 interface UnifiedEditorProps {
@@ -14,7 +13,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
   const editorRef = useRef<HTMLDivElement>(null);
   const [undoStack, setUndoStack] = useState<string[]>([]);
   const [redoStack, setRedoStack] = useState<string[]>([]);
-  const [viewMode, setViewMode] = useState<'simple' | 'paginated'>('paginated');
+  const [viewMode, setViewMode] = useState<'simple' | 'paginated'>('simple');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const { toast } = useToast();
@@ -112,7 +111,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
       
       // Apply formatting immediately
       const textToFormat = extractTextFromDiv(editorRef.current);
-      const formatted = viewMode === 'paginated' ? createPagedHTML(textToFormat) : parseAndFormat(textToFormat);
+      const formatted = parseAndFormat(textToFormat);
       
       if (editorRef.current.innerHTML !== formatted) {
         // Save cursor position
@@ -146,7 +145,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault();
     const text = e.clipboardData.getData('text/plain');
-    const formatted = viewMode === 'paginated' ? createPagedHTML(text) : parseAndFormat(text);
+    const formatted = parseAndFormat(text);
     
     if (editorRef.current) {
       editorRef.current.innerHTML = formatted;
@@ -155,10 +154,10 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
       
       toast({
         title: "تم اللصق",
-        description: `تم تنسيق النص تلقائياً في ${viewMode === 'paginated' ? 'وضع الصفحات A4' : 'الوضع البسيط'}`,
+        description: "تم تنسيق النص تلقائياً",
       });
     }
-  }, [onContentChange, calculatePagination, viewMode, toast]);
+  }, [onContentChange, calculatePagination, toast]);
 
   const handleUndo = () => {
     if (undoStack.length > 1) {
@@ -169,7 +168,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
       setUndoStack(prev => prev.slice(0, -1));
       
       if (editorRef.current) {
-        const formatted = viewMode === 'paginated' ? createPagedHTML(previous) : parseAndFormat(previous);
+        const formatted = parseAndFormat(previous);
         editorRef.current.innerHTML = formatted;
         onContentChange(previous);
         calculatePagination(previous);
@@ -185,7 +184,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
       setRedoStack(prev => prev.slice(0, -1));
       
       if (editorRef.current) {
-        const formatted = viewMode === 'paginated' ? createPagedHTML(next) : parseAndFormat(next);
+        const formatted = parseAndFormat(next);
         editorRef.current.innerHTML = formatted;
         onContentChange(next);
         calculatePagination(next);
@@ -196,22 +195,13 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
   const handleFormat = () => {
     if (editorRef.current) {
       const text = editorRef.current.textContent || "";
-      const formatted = viewMode === 'paginated' ? createPagedHTML(text) : parseAndFormat(text);
+      const formatted = parseAndFormat(text);
       editorRef.current.innerHTML = formatted;
       calculatePagination(text);
       
-      // Restart monitoring after formatting
-      if (viewMode === 'paginated') {
-        setTimeout(() => {
-          textFlowMonitor.startMonitoring(editorRef.current!, (pageNumber) => {
-            setTotalPages(prev => Math.max(prev, pageNumber + 1));
-          });
-        }, 100);
-      }
-      
       toast({
         title: "تم التنسيق",
-        description: `تم إعادة تنسيق النص في ${viewMode === 'paginated' ? 'وضع الصفحات A4' : 'الوضع البسيط'}`,
+        description: "تم إعادة تنسيق النص بنجاح",
       });
     }
   };
@@ -220,55 +210,22 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
     const newMode = viewMode === 'simple' ? 'paginated' : 'simple';
     setViewMode(newMode);
     
-    // Stop current monitoring
-    textFlowMonitor.stopMonitoring();
-    
-    // Re-format content in new mode
-    if (editorRef.current) {
-      const text = editorRef.current.textContent || "";
-      const formatted = newMode === 'paginated' ? createPagedHTML(text) : parseAndFormat(text);
-      editorRef.current.innerHTML = formatted;
-      
-      // Start monitoring for paginated mode
-      if (newMode === 'paginated') {
-        setTimeout(() => {
-          textFlowMonitor.startMonitoring(editorRef.current!, (pageNumber) => {
-            console.log(`Page ${pageNumber} overflow detected - creating new page`);
-            setTotalPages(prev => Math.max(prev, pageNumber + 1));
-          });
-        }, 100);
-      }
-    }
-    
     toast({
       title: "تم تغيير وضع العرض",
-      description: newMode === 'paginated' ? "تم التبديل إلى وضع الصفحات A4" : "تم التبديل إلى الوضع البسيط",
+      description: newMode === 'paginated' ? "وضع الصفحات معطل مؤقتاً" : "الوضع البسيط مُفعَّل",
     });
   };
 
-  // Initialize with sample content and start text flow monitoring
+  // Initialize with sample content
   useEffect(() => {
     if (editorRef.current && content) {
-      const formatted = viewMode === 'paginated' ? createPagedHTML(content) : parseAndFormat(content);
+      const formatted = parseAndFormat(content);
       if (editorRef.current.innerHTML !== formatted) {
         editorRef.current.innerHTML = formatted;
       }
       calculatePagination(content);
-      
-      // Start text flow monitoring for paginated mode
-      if (viewMode === 'paginated') {
-        textFlowMonitor.startMonitoring(editorRef.current, (pageNumber) => {
-          console.log(`Page ${pageNumber} overflow detected - creating new page`);
-          setTotalPages(prev => Math.max(prev, pageNumber + 1));
-        });
-      }
     }
-    
-    // Cleanup monitoring on unmount
-    return () => {
-      textFlowMonitor.stopMonitoring();
-    };
-  }, [content, viewMode, calculatePagination]);
+  }, [content, calculatePagination]);
 
   return (
     <>
@@ -314,24 +271,22 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
           </Button>
         </div>
         <div className="flex items-center space-x-4 space-x-reverse text-sm text-muted-foreground">
-          {viewMode === 'paginated' && (
-            <span>صفحة {currentPage} من {totalPages} (A4)</span>
-          )}
-          <span>محرك الترحيل التلقائي مُفعَّل</span>
+          <span>عدد الكلمات: {content.split(/\s+/).filter(w => w.length > 0).length}</span>
+          <span>تنسيق فوري مُفعَّل</span>
         </div>
       </div>
 
       {/* Main Editor */}
       <div 
         ref={editorRef}
-        className={`editor-container screenplay-container ${viewMode === 'simple' ? 'simple-mode' : ''}`}
+        className="editor-container screenplay-container"
         contentEditable="true"
         onInput={handleInput}
         onPaste={handlePaste}
         data-testid="editor-main"
         suppressContentEditableWarning={true}
         dangerouslySetInnerHTML={{
-          __html: viewMode === 'paginated' ? createPagedHTML(`بسم الله الرحمن الرحيم
+          __html: parseAndFormat(`بسم الله الرحمن الرحيم
 
 مشهد 1 - خارجي - نهار
 شارع في وسط المدينة
@@ -351,27 +306,7 @@ export default function UnifiedEditor({ content, onContentChange }: UnifiedEdito
 
 المقهى دافئ ومريح، مليء بالأشخاص الذين يعملون على أجهزة الكمبيوتر المحمولة أو يتناولون القهوة مع الأصدقاء. أحمد يبحث بعينيه عن شخص محدد.
 
-فاطمة:
-(تلوح له من الطاولة البعيدة)
-أحمد! هنا!`) : parseAndFormat(`بسم الله الرحمن الرحيم
-
-مشهد 1 - خارجي - نهار
-شارع في وسط المدينة
-
-يسير أحمد في شارع مزدحم، يحمل حقيبة صغيرة ويبدو عليه القلق. السيارات تمر بسرعة والناس يتحركون في جميع الاتجاهات. يتوقف أمام مقهى صغير ويتردد للحظة.
-
-أحمد:
-(يتحدث إلى نفسه)
-هل هذا هو المكان الصحيح؟ يجب أن أتأكد من العنوان مرة أخرى.
-
-يخرج هاتفه المحمول ويتحقق من الرسالة النصية. يبتسم ويدخل المقهى بثقة أكبر.
-
-قطع إلى:
-
-مشهد 2 - داخلي - نهار
-داخل المقهى
-
-المقهى دافئ ومريح، مليء بالأشخاص الذين يعملون على أجهزة الكمبيوتر المحمولة أو يتناولون القهوة مع الأصدقاء. أحمد يبحث بعينيه عن شخص محدد.
+شيماء: استاهل خير... ما هواتي جرحته
 
 فاطمة:
 (تلوح له من الطاولة البعيدة)

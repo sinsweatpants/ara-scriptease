@@ -50,12 +50,18 @@ describe('Dialogue Detection and Parsing', () => {
     const div = document.createElement('div');
     div.innerHTML = formatted;
 
-    const characterDiv = div.querySelector('.character-name');
-    const dialogueDiv = div.querySelector('.dialogue-text');
+    // Check for inline styles instead of classes
+    const characterElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontWeight === 'bold'
+    );
+    const dialogueElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.lineHeight === '1.2'
+    );
 
-    expect(div.querySelector('.dialogue-block')).not.toBeNull();
-    expect(characterDiv?.textContent).toBe('شيماء');
-    expect(dialogueDiv?.textContent).toBe('استاهل خير... ما هواتي جرحته');
+    expect(characterElements.length).toBeGreaterThan(0);
+    expect(characterElements[0]?.textContent).toBe('شيماء');
+    expect(dialogueElements.length).toBeGreaterThan(0);
+    expect(dialogueElements[0]?.textContent).toBe('استاهل خير... ما هواتي جرحته');
   });
 
   it('should not classify a dialogue line as an action', () => {
@@ -64,9 +70,16 @@ describe('Dialogue Detection and Parsing', () => {
     const div = document.createElement('div');
     div.innerHTML = formatted;
 
-    // Should have dialogue block, not action
-    expect(div.querySelector('.dialogue-block')).not.toBeNull();
-    expect(div.querySelector('.action')).toBeNull();
+    // Should have character and dialogue elements with proper styles
+    const characterElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontWeight === 'bold'
+    );
+    const actionElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'right' && el.style.margin === '0rem 0px'
+    );
+
+    expect(characterElements.length).toBeGreaterThan(0);
+    expect(actionElements.length).toBe(0);
   });
 
   it('should handle multi-line dialogue correctly', () => {
@@ -77,16 +90,39 @@ describe('Dialogue Detection and Parsing', () => {
     const div = document.createElement('div');
     div.innerHTML = formatted;
 
-    const dialogueBlock = div.querySelector('.dialogue-block');
-    const characterName = div.querySelector('.character-name');
-    const dialogueText = div.querySelector('.dialogue-text');
+    // Check for inline styles instead of classes
+    const characterElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontWeight === 'bold'
+    );
+    const dialogueElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.lineHeight === '1.2'
+    );
 
-    expect(dialogueBlock).not.toBeNull();
-    expect(characterName?.textContent).toBe('هند');
-    expect(dialogueText?.textContent).toContain('أعطني الحبر');
+    expect(characterElements.length).toBeGreaterThan(0);
+    expect(characterElements[0]?.textContent).toBe('هند');
+    expect(dialogueElements.length).toBeGreaterThan(0);
+    expect(dialogueElements[0]?.textContent).toContain('أعطني الحبر');
+  });
+
+  it('should handle dialogue on same line as character name', () => {
+    const text = "شيماء: استاهل خير... ما هواتي جرحته";
     
-    // Should not be classified as action
-    expect(div.querySelector('.action')).toBeNull();
+    const formatted = parseAndFormat(text);
+    const div = document.createElement('div');
+    div.innerHTML = formatted;
+
+    // Check for inline styles
+    const characterElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontWeight === 'bold'
+    );
+    const dialogueElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.lineHeight === '1.2'
+    );
+
+    expect(characterElements.length).toBeGreaterThan(0);
+    expect(characterElements[0]?.textContent).toBe('شيماء');
+    expect(dialogueElements.length).toBeGreaterThan(0);
+    expect(dialogueElements[0]?.textContent).toBe('استاهل خير... ما هواتي جرحته');
   });
 
   it('should handle parentheticals in dialogue', () => {
@@ -98,9 +134,19 @@ describe('Dialogue Detection and Parsing', () => {
     const div = document.createElement('div');
     div.innerHTML = formatted;
 
-    expect(div.querySelector('.character-name')?.textContent).toBe('أحمد');
-    expect(div.querySelector('.parenthetical')?.textContent).toBe('(بصوت منخفض)');
-    expect(div.querySelector('.dialogue-text')?.textContent).toBe('لا أستطيع أن أصدق ما حدث');
+    const characterElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontWeight === 'bold'
+    );
+    const parentheticalElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.fontStyle === 'italic'
+    );
+    const dialogueElements = Array.from(div.querySelectorAll('div')).filter(el => 
+      el.style.textAlign === 'center' && el.style.lineHeight === '1.2'
+    );
+
+    expect(characterElements[0]?.textContent).toBe('أحمد');
+    expect(parentheticalElements[0]?.textContent).toBe('(بصوت منخفض)');
+    expect(dialogueElements[0]?.textContent).toBe('لا أستطيع أن أصدق ما حدث');
   });
 
   it('should extract complete dialogue blocks correctly', () => {

@@ -1,3 +1,5 @@
+import type { CSSProperties } from 'react';
+
 // Advanced Dialogue Detection - كاشف الحوار المتقدم
 // Specialized module for detecting Arabic dialogue patterns
 
@@ -9,15 +11,28 @@ export interface DialogueBlock {
   endIndex: number;
 }
 
+export const formatStyles: { [key: string]: CSSProperties } = {
+    basmala: { textAlign: 'left', margin: '0 0 2rem 0', fontWeight: 'bold' },
+    'scene-header-top-line': { display: 'flex', justifyContent: 'space-between', width: '100%', margin: '0rem 0 0 0' },
+    'scene-header-3': { textAlign: 'center', fontWeight: 'bold', margin: '0' },
+    action: { textAlign: 'right', margin: '0rem 0' },
+    character: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0rem auto 0 auto', width: '2.5in' },
+    parenthetical: { textAlign: 'center', fontStyle: 'italic', margin: '0 auto', width: '2.0in' },
+    dialogue: { textAlign: 'center', margin: '0 auto 0.3rem auto', width: '2.5in', lineHeight: '1.2' },
+    transition: { textAlign: 'center', fontWeight: 'bold', textTransform: 'uppercase', margin: '0rem 0' }
+};
+
 export class DialogueDetector {
   
   // Enhanced character name detection
+  // تم تحسينه للتعرف على أسماء الشخصيات العربية المتبوعة بنقطتين، حتى مع وجود حوار على نفس السطر
   static isCharacterName(line: string): boolean {
     const trimmed = line.trim();
     
-    // Primary pattern: Arabic name followed by a colon (UPDATED)
-    // النمط الأساسي: اسم عربي متبوع بنقطتين رأسيتين (تحديث)
-    if (trimmed.match(/^[\u0600-\u06FF\s]+[:|：]$/) !== null) {
+    // Primary pattern: Arabic name followed by a colon. Allows dialogue on the same line.
+    // النمط الأساسي: اسم عربي متبوع بنقطتين رأسيتين. يسمح بوجود حوار على نفس السطر
+    const match = trimmed.match(/^([\u0600-\u06FF\s()]+)(:|：)/);
+    if (match && !this.containsCommonWords(match[1])) {
       return true;
     }
     
@@ -60,13 +75,32 @@ export class DialogueDetector {
   static extractDialogueBlock(lines: string[], startIndex: number): DialogueBlock | null {
     if (startIndex >= lines.length) return null;
     
-    const characterLine = lines[startIndex].trim();
-    if (!this.isCharacterName(characterLine)) return null;
+    const firstLine = lines[startIndex].trim();
+    if (!this.isCharacterName(firstLine)) return null;
     
-    const characterName = characterLine.replace(':', '').trim();
+    let characterName = '';
+    let dialogueOnFirstLine = '';
+    const colonMatch = firstLine.match(/:|：/);
+
+    if (colonMatch && colonMatch.index) {
+        characterName = firstLine.substring(0, colonMatch.index).trim();
+        dialogueOnFirstLine = firstLine.substring(colonMatch.index + 1).trim();
+    } else {
+        // This handles the case for character name on a line by itself without a colon
+        characterName = firstLine;
+    }
+
     const parentheticals: string[] = [];
     const dialogueLines: string[] = [];
     let currentIndex = startIndex + 1;
+    
+    if (dialogueOnFirstLine) {
+        if (this.isParenthetical(dialogueOnFirstLine)) {
+            parentheticals.push(dialogueOnFirstLine);
+        } else {
+            dialogueLines.push(dialogueOnFirstLine);
+        }
+    }
     
     // Process subsequent lines
     while (currentIndex < lines.length) {

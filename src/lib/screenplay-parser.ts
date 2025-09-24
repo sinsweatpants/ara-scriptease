@@ -6,7 +6,16 @@ function escapeHtml(text: string): string {
 }
 
 // Import advanced dialogue detector
-import DialogueDetector from './dialogue-detector';
+import DialogueDetector, { formatStyles } from './dialogue-detector';
+import type { CSSProperties } from 'react';
+
+// Helper function to convert style object to string
+function styleObjectToString(style: CSSProperties): string {
+    return Object.entries(style).map(([key, value]) => {
+        const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+        return `${cssKey}: ${value}`;
+    }).join('; ');
+}
 
 // Helper function to detect character names - محسن باستخدام كاشف الحوار
 function isCharacterName(line: string): boolean {
@@ -44,18 +53,24 @@ export function parseAndFormat(text: string): string {
   const lines = text.split('\n');
   let formattedHTML = '';
   
+
+    
+  const actionStyle = styleObjectToString(formatStyles.action);
+  const basmalaStyle = styleObjectToString(formatStyles.basmala);
+  const transitionStyle = styleObjectToString(formatStyles.transition);
+  
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i].trim();
     
     // Handle empty lines
     if (!line) {
-      formattedHTML += '<div class="action"><br></div>';
+      formattedHTML += `<div style="${actionStyle}"><br></div>`;
       continue;
     }
     
     // 1. Basmala detection - البسملة
     if (line.includes('بسم الله الرحمن الرحيم')) {
-      formattedHTML += `<div class="basmala">${escapeHtml(line)}</div>`;
+      formattedHTML += `<div style="${basmalaStyle}">${escapeHtml(line)}</div>`;
     }
     
     // 2. Scene header detection - رأس المشهد (محسن)
@@ -86,13 +101,16 @@ export function parseAndFormat(text: string): string {
           place = lines[i].trim();
         }
         
+        const sceneHeaderTopLineStyle = styleObjectToString(formatStyles['scene-header-top-line']);
+        const sceneHeader3Style = styleObjectToString(formatStyles['scene-header-3']);
+
         formattedHTML += `
-          <div class="scene-header-container">
-            <div class="scene-header-top-line">
-              <span class="scene-header-1">${escapeHtml(sceneNum)}</span>
-              <span class="scene-header-2">${escapeHtml(timeLocation)}</span>
+          <div>
+            <div style="${sceneHeaderTopLineStyle}">
+              <span>${escapeHtml(sceneNum)}</span>
+              <span>${escapeHtml(timeLocation)}</span>
             </div>
-            <div class="scene-header-3">${escapeHtml(place)}</div>
+            <div style="${sceneHeader3Style}">${escapeHtml(place)}</div>
           </div>`;
       }
     }
@@ -104,18 +122,22 @@ export function parseAndFormat(text: string): string {
       const dialogueBlock = DialogueDetector.extractDialogueBlock(lines, i);
       
       if (dialogueBlock) {
+        const characterStyle = styleObjectToString(formatStyles.character);
+        const parentheticalStyle = styleObjectToString(formatStyles.parenthetical);
+        const dialogueStyle = styleObjectToString(formatStyles.dialogue);
+
         // Generate HTML for the complete dialogue block
-        let dialogueHTML = '<div class="dialogue-block">';
-        dialogueHTML += `<div class="character-name">${escapeHtml(dialogueBlock.characterName)}</div>`;
+        let dialogueHTML = '<div>';
+        dialogueHTML += `<div style="${characterStyle}">${escapeHtml(dialogueBlock.characterName)}</div>`;
         
         // Add parentheticals first
         for (const parenthetical of dialogueBlock.parentheticals) {
-          dialogueHTML += `<div class="parenthetical">${escapeHtml(parenthetical)}</div>`;
+          dialogueHTML += `<div style="${parentheticalStyle}">${escapeHtml(parenthetical)}</div>`;
         }
         
         // Add dialogue lines
         for (const dialogueLine of dialogueBlock.dialogueLines) {
-          dialogueHTML += `<div class="dialogue-text">${escapeHtml(dialogueLine)}</div>`;
+          dialogueHTML += `<div style="${dialogueStyle}">${escapeHtml(dialogueLine)}</div>`;
         }
         
         dialogueHTML += '</div>';
@@ -125,19 +147,19 @@ export function parseAndFormat(text: string): string {
         i = dialogueBlock.endIndex;
       } else {
         // Fallback to treating as action if dialogue detection fails
-        formattedHTML += `<div class="action">${escapeHtml(line)}</div>`;
+        formattedHTML += `<div style="${actionStyle}">${escapeHtml(line)}</div>`;
       }
     }
     
     // 5. Transition detection - مؤشرات الانتقال
     else if (isTransition(line)) {
-      formattedHTML += `<div class="transition">${escapeHtml(line)}</div>`;
+      formattedHTML += `<div style="${transitionStyle}">${escapeHtml(line)}</div>`;
     }
     
     // 3. Default to action (LAST RESORT)
     // 3. الافتراضي هو السرد الحركي (الحل الأخير)
     else {
-      formattedHTML += `<div class="action">${escapeHtml(line)}</div>`;
+      formattedHTML += `<div style="${actionStyle}">${escapeHtml(line)}</div>`;
     }
   }
   

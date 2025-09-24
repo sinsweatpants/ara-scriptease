@@ -116,17 +116,23 @@
 .screenplay-container {
   margin-left: 1in;
   margin-right: 1.5in;
-  font-family: var(--font-arabic), 'Courier New', monospace;
+  font-family: var(--font-arabic), 'Times New Roman', serif;
   line-height: 1.5;
   direction: rtl;
   text-align: right;
+  max-width: 8.5in;
+  margin: 0 auto;
+  padding: 1in;
+  background: white;
+  min-height: 100vh;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
 .basmala {
   text-align: left;
+  margin: 0 0 2rem 0;
   font-weight: bold;
   font-size: 18pt;
-  margin: 20px 0;
   color: hsl(var(--primary));
 }
 
@@ -140,91 +146,89 @@
 }
 
 .scene-header-top-line {
+  display: flex;
+  justify-content: space-between;
   width: 100%;
-  display: block;
-  overflow: hidden;
+  margin: 0rem 0 0 0;
 }
 
 .scene-header-1 {
   font-weight: bold;
   font-size: 16pt;
-  float: right;
-  margin: 0 10px;
   color: hsl(var(--primary));
 }
 
 .scene-header-2 {
   font-weight: normal;
   font-size: 14pt;
-  float: left;
-  margin: 0 10px;
   color: hsl(var(--muted-foreground));
 }
 
 .scene-header-3 {
   text-align: center;
+  font-weight: bold;
+  margin: 0;
   font-size: 13pt;
-  font-style: italic;
-  margin-top: 4px;
-  margin-bottom: 12px;
-  clear: both;
   color: hsl(var(--foreground));
 }
 
 .action {
   text-align: right;
-  margin: 10px 0;
+  margin: 0rem 0;
   color: hsl(var(--foreground));
 }
 
 .dialogue-block {
-  margin-left: 20%;
-  margin-right: 20%;
-  text-align: center;
+  margin: 15px 0;
   background: hsl(var(--accent));
   padding: 15px;
   border-radius: 6px;
-  margin: 15px 0;
 }
 
 .character-name {
+  text-align: center;
   font-weight: bold;
   text-transform: uppercase;
-  margin-bottom: 5px;
+  margin: 0rem auto 0 auto;
+  width: 2.5in;
   color: hsl(var(--primary));
 }
 
 .parenthetical {
+  text-align: center;
   font-style: italic;
+  margin: 0 auto;
+  width: 2.0in;
   color: hsl(var(--muted-foreground));
-  margin: 5px 0;
 }
 
 .dialogue-text {
+  text-align: center;
+  margin: 0 auto 0.3rem auto;
+  width: 2.5in;
+  line-height: 1.2;
   color: hsl(var(--foreground));
-  margin-top: 5px;
 }
 
 .transition {
   text-align: center;
   font-weight: bold;
   text-transform: uppercase;
-  margin: 20px 0;
+  margin: 0rem 0;
   color: hsl(var(--primary));
 }
 
 .editor-container {
   min-height: 600px;
-  border: 1px solid hsl(var(--border));
-  border-radius: 8px;
+  border: none;
   padding: 20px;
-  background: hsl(var(--background));
+  background: white;
   direction: rtl;
+  outline: none;
 }
 
 .editor-container:focus {
-  outline: 2px solid hsl(var(--ring));
-  outline-offset: 2px;
+  outline: none;
 }
 
 .toolbar {
@@ -323,9 +327,16 @@
     min-height: calc(297mm - 1.5in);
   }
   
-  .dialogue-block {
-    margin-left: 15%;
-    margin-right: 15%;
+  .character-name {
+    width: 2.2in;
+  }
+  
+  .parenthetical {
+    width: 1.8in;
+  }
+  
+  .dialogue-text {
+    width: 2.2in;
   }
 }
 
@@ -338,9 +349,16 @@
     padding: 0.5in 0.5in 0.5in 1in;
   }
   
-  .dialogue-block {
-    margin-left: 10%;
-    margin-right: 10%;
+  .character-name {
+    width: 2in;
+  }
+  
+  .parenthetical {
+    width: 1.5in;
+  }
+  
+  .dialogue-text {
+    width: 2in;
   }
 }
 
@@ -349,9 +367,16 @@
     padding: 0.25in;
   }
   
-  .dialogue-block {
-    margin-left: 5%;
-    margin-right: 5%;
+  .character-name {
+    width: 90%;
+  }
+  
+  .parenthetical {
+    width: 85%;
+  }
+  
+  .dialogue-text {
+    width: 90%;
   }
 }
 
