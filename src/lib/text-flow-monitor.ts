@@ -187,7 +187,7 @@ export class TextFlowMonitor {
     pageContent.className = 'page-content';
     
     const pageNumberElement = document.createElement('div');
-    pageNumberElement.className = 'page-number';
+    pageNumberElement.className = 'page-footer';
     pageNumberElement.textContent = pageNumber.toString();
     
     page.appendChild(pageContent);
@@ -204,7 +204,7 @@ export class TextFlowMonitor {
       const pageNumber = index + 1;
       page.setAttribute('data-page', pageNumber.toString());
       
-      const pageNumberElement = page.querySelector('.page-number');
+      const pageNumberElement = page.querySelector('.page-footer');
       if (pageNumberElement) {
         pageNumberElement.textContent = pageNumber.toString();
       }

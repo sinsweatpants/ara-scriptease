@@ -1,7 +1,7 @@
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { AlignLeft, Undo, Redo, FileText, Layers } from "lucide-react";
-import { paginationEngine } from "@/lib/pagination-engine";
+import { AlignLeft, Undo, Redo, FileText } from "lucide-react";
+import { createPagedHTML } from "@/lib/screenplay-parser";
 import { useToast } from "@/hooks/use-toast";
 
 interface PaginatedUnifiedEditorProps {
@@ -49,11 +49,14 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
             }
           } else if (className.includes('dialogue-block')) {
             // Handle dialogue blocks
-            const characterName = element.querySelector('.character-name')?.textContent || '';
+            const characterName =
+              element.querySelector('.character-name')?.textContent ||
+              element.querySelector('.character')?.textContent ||
+              '';
             text += characterName + ':\n';
 
             const parentheticals = element.querySelectorAll('.parenthetical');
-            const dialogues = element.querySelectorAll('.dialogue-text');
+            const dialogues = element.querySelectorAll('.dialogue-text, .dialogue');
 
             parentheticals.forEach(p => text += p.textContent + '\n');
             dialogues.forEach(d => text += d.textContent + '\n');
@@ -77,14 +80,19 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
 
   // Calculate pagination and update display
   const updatePagination = useCallback((text: string) => {
-    const elements = paginationEngine.analyzeContent(text);
-    const pages = paginationEngine.createPages(elements);
-    setTotalPages(pages.length);
+    const paginatedHTML = createPagedHTML(text);
 
-    // Update HTML with paginated content
     if (editorRef.current) {
-      const paginatedHTML = paginationEngine.generatePaginatedHTML(text);
       editorRef.current.innerHTML = paginatedHTML;
+      const pageCount = editorRef.current.querySelectorAll('.page').length || 1;
+      setTotalPages(pageCount);
+      setCurrentPage(prev => Math.min(prev, pageCount));
+    } else {
+      const temp = document.createElement('div');
+      temp.innerHTML = paginatedHTML;
+      const pageCount = temp.querySelectorAll('.page').length || 1;
+      setTotalPages(pageCount);
+      setCurrentPage(prev => Math.min(prev, pageCount));
     }
   }, []);
 
