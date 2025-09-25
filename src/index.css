@@ -561,15 +561,15 @@ body {
 
 /* ========================== المساطر (Ruler) ================================ */
 .ruler-container {
-  position: fixed;
+  position: absolute;
   background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
   border: 1px solid #ccc;
-  z-index: 1000;
+  z-index: 10;
   box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .ruler-container.horizontal {
-  top: 0;
+  top: -30px;
   left: 0;
   height: 25px;
   border-bottom: 2px solid #999;
@@ -578,7 +578,7 @@ body {
 
 .ruler-container.vertical {
   top: 0;
-  right: 0;
+  right: -30px;
   width: 25px;
   border-left: 2px solid #999;
   /* Height will be set dynamically by component */
