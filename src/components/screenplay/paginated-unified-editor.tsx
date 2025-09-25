@@ -3,6 +3,8 @@ import { Button } from "@/components/ui/button";
 import { AlignLeft, Undo, Redo, FileText } from "lucide-react";
 import { createPagedHTML } from "@/lib/screenplay-parser";
 import { useToast } from "@/hooks/use-toast";
+import Ruler from "./ruler";
+import { AdvancedPaginationEngine } from "@/lib/advanced-pagination-engine";
 
 interface PaginatedUnifiedEditorProps {
   content: string;
@@ -16,6 +18,7 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isEditing, setIsEditing] = useState(true); // Enable editing by default
+  const [paginationEngine, setPaginationEngine] = useState<AdvancedPaginationEngine | null>(null);
   const { toast } = useToast();
 
   // Extract text content from paginated HTML
@@ -96,9 +99,9 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
     }
   }, []);
 
-  // Handle content editing
+  // Handle content editing with advanced engine
   const handleInput = useCallback((e: React.FormEvent) => {
-    if (!isEditing) return;
+    if (!isEditing || !paginationEngine) return;
 
     const target = e.target as HTMLElement;
     let newContent = '';
@@ -109,25 +112,23 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
       newContent = allPagesText;
     }
 
-    // Update content and pagination
+    // Update content
     onContentChange(newContent);
 
     // Add to undo stack
     setUndoStack(prev => [...prev.slice(-19), newContent]);
     setRedoStack([]);
 
-    // Debounced pagination update
-    setTimeout(() => {
-      updatePagination(newContent);
-    }, 500);
+    // Update page count
+    setTotalPages(paginationEngine.getPageCount());
 
-  }, [isEditing, extractTextFromPaginatedHTML, onContentChange, updatePagination]);
+  }, [isEditing, paginationEngine, extractTextFromPaginatedHTML, onContentChange]);
 
-  // Handle paste operations
+  // Handle paste operations with advanced engine
   const handlePaste = useCallback((e: React.ClipboardEvent) => {
     e.preventDefault();
 
-    if (!isEditing) {
+    if (!isEditing || !paginationEngine) {
       toast({
         title: "تحذير",
         description: "يجب تفعيل وضع التحرير أولاً",
@@ -137,82 +138,132 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
     }
 
     const pastedText = e.clipboardData.getData('text/plain');
-
-    // Clear current content if pasting into a placeholder
-    const currentContent = extractTextFromPaginatedHTML(editorRef.current?.innerHTML || '');
-    if (currentContent.includes('انقر هنا لبدء الكتابة')) {
-      // Replace placeholder content
-      onContentChange(pastedText);
-      updatePagination(pastedText);
-
-      // Add to undo stack
-      setUndoStack(prev => [...prev.slice(-19), pastedText]);
-      setRedoStack([]);
-    } else {
-      // Append to current cursor position
-      const selection = window.getSelection();
-      if (selection && selection.rangeCount > 0) {
-        const range = selection.getRangeAt(0);
-        range.deleteContents();
-        range.insertNode(document.createTextNode(pastedText));
-
-        // Collapse range to end
-        range.collapse(false);
-        selection.removeAllRanges();
-        selection.addRange(range);
-
-        // Update content
-        const newContent = extractTextFromPaginatedHTML(editorRef.current?.innerHTML || '');
-        onContentChange(newContent);
-        updatePagination(newContent);
-
-        // Add to undo stack
-        setUndoStack(prev => [...prev.slice(-19), newContent]);
-        setRedoStack([]);
+    const lines = pastedText.split('\n');
+    
+    // مسح المحتوى الحالي وإعادة البناء
+    paginationEngine.clear();
+    
+    // معالجة كل سطر
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      
+      if (trimmed.includes('بسم الله الرحمن الرحيم')) {
+        paginationEngine.appendBlock(() => {
+          const basmala = document.createElement('div');
+          basmala.className = 'basmala';
+          basmala.textContent = trimmed;
+          return basmala;
+        });
+      } else if (trimmed.match(/^(مشهد|م\.)\s*\d+/i)) {
+        const parts = trimmed.split(/[-–—]/)
+        const sceneNum = parts[0]?.trim() || trimmed;
+        const timeLocation = parts[1]?.trim() || '';
+        const place = parts[2]?.trim() || '';
+        paginationEngine.appendSceneHeader(sceneNum, timeLocation, place);
+      } else if (trimmed.match(/^[\u0600-\u06FF][\u0600-\u06FF\s]*:/)) {
+        const [character, ...dialogueParts] = trimmed.split(':');
+        const dialogue = dialogueParts.join(':').trim();
+        paginationEngine.appendDialogue(character.trim(), dialogue || 'حوار...');
+      } else if (trimmed.match(/^\(.*\)$/)) {
+        paginationEngine.appendBlock(() => {
+          const par = document.createElement('div');
+          par.className = 'parenthetical';
+          par.textContent = trimmed;
+          return par;
+        });
+      } else if (trimmed.match(/^(قطع|انتقال|فيد|ذوبان)/i)) {
+        paginationEngine.appendTransition(trimmed);
+      } else {
+        paginationEngine.appendAction(trimmed);
       }
     }
+    
+    onContentChange(pastedText);
+    setTotalPages(paginationEngine.getPageCount());
+    setUndoStack(prev => [...prev.slice(-19), pastedText]);
+    setRedoStack([]);
 
     toast({
       title: "تم اللصق بنجاح ✅",
-      description: `تم إدراج النص مع الترقيم التلقائي (${pastedText.split('\n').length} سطر)`,
+      description: `تم إدراج النص مع الترقيم التلقائي (${lines.length} سطر، ${paginationEngine.getPageCount()} صفحة)`,
     });
-  }, [isEditing, extractTextFromPaginatedHTML, onContentChange, updatePagination, toast]);
+  }, [isEditing, paginationEngine, onContentChange, toast]);
 
-  // Undo functionality
+  // Undo functionality with advanced engine
   const handleUndo = () => {
-    if (undoStack.length > 1) {
+    if (undoStack.length > 1 && paginationEngine) {
       const current = undoStack[undoStack.length - 1];
       const previous = undoStack[undoStack.length - 2];
 
       setRedoStack(prev => [...prev, current]);
       setUndoStack(prev => prev.slice(0, -1));
 
+      // إعادة بناء المحتوى
+      paginationEngine.clear();
+      const lines = previous.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) paginationEngine.appendAction(trimmed);
+      }
+      
       onContentChange(previous);
-      updatePagination(previous);
+      setTotalPages(paginationEngine.getPageCount());
     }
   };
 
-  // Redo functionality
+  // Redo functionality with advanced engine
   const handleRedo = () => {
-    if (redoStack.length > 0) {
+    if (redoStack.length > 0 && paginationEngine) {
       const next = redoStack[redoStack.length - 1];
 
       setUndoStack(prev => [...prev, next]);
       setRedoStack(prev => prev.slice(0, -1));
 
+      // إعادة بناء المحتوى
+      paginationEngine.clear();
+      const lines = next.split('\n');
+      for (const line of lines) {
+        const trimmed = line.trim();
+        if (trimmed) paginationEngine.appendAction(trimmed);
+      }
+      
       onContentChange(next);
-      updatePagination(next);
+      setTotalPages(paginationEngine.getPageCount());
     }
   };
 
-  // Format text
+  // Format text with advanced engine
   const handleFormat = () => {
+    if (!paginationEngine) return;
+    
     const currentText = extractTextFromPaginatedHTML(editorRef.current?.innerHTML || '');
-    updatePagination(currentText);
+    
+    // إعادة بناء المحتوى بالتنسيق الصحيح
+    paginationEngine.clear();
+    const lines = currentText.split('\n');
+    
+    for (const line of lines) {
+      const trimmed = line.trim();
+      if (!trimmed) continue;
+      
+      if (trimmed.includes('بسم الله الرحمن الرحيم')) {
+        paginationEngine.appendBlock(() => {
+          const basmala = document.createElement('div');
+          basmala.className = 'basmala';
+          basmala.textContent = trimmed;
+          return basmala;
+        });
+      } else {
+        paginationEngine.appendAction(trimmed);
+      }
+    }
+    
+    setTotalPages(paginationEngine.getPageCount());
 
     toast({
       title: "تم التنسيق",
-      description: "تم إعادة تنسيق النص مع ترقيم الصفحات",
+      description: `تم إعادة تنسيق النص (${paginationEngine.getPageCount()} صفحة)`,
     });
   };
 
@@ -227,28 +278,40 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
     }
   };
 
-  // Initialize pagination with sample content if empty
+  // Initialize pagination engine and sample content
   useEffect(() => {
-    const initialContent = content || `بسم الله الرحمن الرحيم
-
-مشهد 1 ليل-داخلي
-شقة هند في بيروت
-
-ترقد هند على السرير وهي تنظر إلى السقف. الغرفة مضاءة بنور خافت.
-
-هند:
-(هامسة لنفسها)
-لا أستطيع النوم...
-
-انقر هنا لبدء الكتابة أو استخدم Ctrl+V للصق النص.`;
-
-    updatePagination(initialContent);
-    setUndoStack([initialContent]);
-
-    if (!content) {
-      onContentChange(initialContent);
+    if (editorRef.current && !paginationEngine) {
+      // إنشاء مضيف الصفحات
+      const pagesHost = document.createElement('div');
+      pagesHost.className = 'pages-host';
+      editorRef.current.innerHTML = '';
+      editorRef.current.appendChild(pagesHost);
+      
+      // إنشاء محرك التخطيط
+      const engine = new AdvancedPaginationEngine(pagesHost);
+      setPaginationEngine(engine);
+      
+      // إضافة محتوى تجريبي
+      if (!content) {
+        engine.appendBlock(() => {
+          const basmala = document.createElement('div');
+          basmala.className = 'basmala';
+          basmala.textContent = 'بسم الله الرحمن الرحيم';
+          return basmala;
+        });
+        
+        engine.appendSceneHeader('مشهد 1', 'ليل-داخلي', 'شقة هند في بيروت');
+        
+        engine.appendAction('ترقد هند على السرير وهي تنظر إلى السقف. الغرفة مضاءة بنور خافت.');
+        
+        engine.appendDialogue('هند', 'لا أستطيع النوم...', 'هامسة لنفسها');
+        
+        engine.appendAction('انقر هنا لبدء الكتابة أو استخدم Ctrl+V للصق النص.');
+        
+        setTotalPages(engine.getPageCount());
+      }
     }
-  }, [content, updatePagination, onContentChange]);
+  }, [editorRef.current, paginationEngine, content]);
 
   // Set contentEditable when editor is ready
   useEffect(() => {
@@ -337,22 +400,30 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
         </div>
       </div>
 
-      {/* Paginated Editor */}
-      <div
-        ref={editorRef}
-        className="screenplay-pages-container"
-        contentEditable={isEditing}
-        onInput={handleInput}
-        onPaste={handlePaste}
-        data-testid="editor-paginated"
-        suppressContentEditableWarning={true}
-        style={{
-          outline: 'none',
-          minHeight: '297mm',
-          background: '#f5f5f5',
-          padding: '20px',
-        }}
-      />
+      {/* Paginated Editor with Rulers */}
+      <div className="relative">
+        {/* المساطر */}
+        <Ruler orientation="horizontal" />
+        <Ruler orientation="vertical" />
+        
+        <div
+          ref={editorRef}
+          className="screenplay-pages-container"
+          contentEditable={isEditing}
+          onInput={handleInput}
+          onPaste={handlePaste}
+          data-testid="editor-paginated"
+          suppressContentEditableWarning={true}
+          style={{
+            outline: 'none',
+            minHeight: '297mm',
+            background: '#f5f5f5',
+            padding: '20px',
+            marginTop: '20px',
+            marginRight: '20px',
+          }}
+        />
+      </div>
     </>
   );
 }

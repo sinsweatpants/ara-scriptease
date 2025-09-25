@@ -558,3 +558,53 @@ body {
     print-color-adjust: exact;
   }
 }
+
+/* ========================== المساطر (Ruler) ================================ */
+.ruler-container {
+  position: absolute;
+  background: #e0e0e0;
+  border: 1px solid #ccc;
+  z-index: 10;
+}
+
+.ruler-container.horizontal {
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 20px;
+  border-bottom: 2px solid #999;
+}
+
+.ruler-container.vertical {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 20px;
+  border-left: 2px solid #999;
+}
+
+.ruler-number {
+  position: absolute;
+  font-size: 10px;
+  font-weight: bold;
+  color: #333;
+  user-select: none;
+}
+
+.ruler-container.horizontal .ruler-number {
+  top: 2px;
+}
+
+.ruler-container.vertical .ruler-number {
+  right: 2px;
+  writing-mode: vertical-rl;
+}
+
+.ruler-container.dark {
+  background: #333;
+  border-color: #555;
+}
+
+.ruler-container.dark .ruler-number {
+  color: #fff;
+}
