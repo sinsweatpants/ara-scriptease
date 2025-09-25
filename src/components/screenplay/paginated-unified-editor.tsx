@@ -401,18 +401,18 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
       </div>
 
       {/* Paginated Editor with Rulers */}
-      <div className="editor-area-wrapper" style={{ position: 'relative', paddingTop: '30px', paddingRight: '30px', margin: '0 auto' }}>
-        <Ruler orientation="horizontal" />
-        <Ruler orientation="vertical" />
+      <div className="editor-area-wrapper" style={{ 
+        position: 'relative', 
+        paddingTop: '30px', 
+        paddingRight: '30px', 
+        margin: '0 auto',
+        display: 'flex',
+        justifyContent: 'center'
+      }}>
         <div
           ref={editorRef}
-          className="screenplay-pages-container"
-          contentEditable={isEditing}
-          onInput={handleInput}
-          onPaste={handlePaste}
-          data-testid="editor-paginated"
-          suppressContentEditableWarning={true}
           style={{
+            position: 'relative',
             outline: 'none',
             height: '29.7cm',
             width: '21cm',
@@ -423,7 +423,16 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
             paddingRight: '3.81cm',     // 1.5 inches
             paddingLeft: '2.54cm'       // 1 inch
           }}
-        />
+          className="screenplay-pages-container"
+          contentEditable={isEditing}
+          onInput={handleInput}
+          onPaste={handlePaste}
+          data-testid="editor-paginated"
+          suppressContentEditableWarning={true}
+        >
+          <Ruler orientation="horizontal" targetElement={editorRef.current} />
+          <Ruler orientation="vertical" targetElement={editorRef.current} />
+        </div>
       </div>
     </>
   );

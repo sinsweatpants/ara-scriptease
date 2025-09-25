@@ -3,57 +3,70 @@
 import React, { useEffect, useState } from 'react';
 
 /**
- * A ruler component for horizontal or vertical orientation.
- * It displays centimeter markings based on A4 paper dimensions.
- * Calculates precise pixel-to-cm ratio based on actual displayed page size.
+ * مكون المسطرة للاتجاه الأفقي أو الرأسي
+ * يعرض علامات السنتيمتر بناءً على أبعاد ورقة A4
+ * يحسب نسبة البكسل إلى السنتيمتر الدقيقة بناءً على حجم الصفحة المعروضة فعلياً
  */
-const Ruler = ({ orientation = 'horizontal', isDarkMode }: { orientation?: 'horizontal' | 'vertical'; isDarkMode?: boolean }) => {
-  const [pixelsPerCm, setPixelsPerCm] = useState(37.8); // fallback value
+const Ruler = ({ 
+  orientation = 'horizontal', 
+  isDarkMode,
+  targetElement 
+}: { 
+  orientation?: 'horizontal' | 'vertical'; 
+  isDarkMode?: boolean;
+  targetElement?: HTMLElement | null;
+}) => {
+  const [pixelsPerCm, setPixelsPerCm] = useState(37.8); // قيمة احتياطية
+  const [rulerLength, setRulerLength] = useState(0);
   
-  // A4 dimensions in cm
+  // أبعاد A4 بالسنتيمتر
   const widthCm = 21;
   const heightCm = 29.7;
 
   useEffect(() => {
-    // Calculate actual pixels per cm based on displayed page size
+    // حساب البكسل لكل سنتيمتر الفعلي بناءً على حجم الصفحة المعروضة
     const calculatePixelsPerCm = () => {
-      // Look for any A4 page element to measure
-      const pageElement = document.querySelector('.page, .screenplay-container, [style*="21cm"], [style*="210mm"]');
+      // البحث عن عنصر صفحة A4 للقياس
+      const pageElement = targetElement || 
+        document.querySelector('.page, .screenplay-container, .screenplay-pages-container, [style*="21cm"], [style*="210mm"]');
       
       if (pageElement) {
         const rect = pageElement.getBoundingClientRect();
         
         if (orientation === 'horizontal') {
-          // Calculate based on actual displayed width vs 21cm
+          // حساب بناءً على العرض المعروض الفعلي مقابل 21 سم
           const actualPixelsPerCm = rect.width / widthCm;
           setPixelsPerCm(actualPixelsPerCm);
+          setRulerLength(rect.width);
         } else {
-          // Calculate based on actual displayed height vs 29.7cm
+          // حساب بناءً على الارتفاع المعروض الفعلي مقابل 29.7 سم
           const actualPixelsPerCm = rect.height / heightCm;
           setPixelsPerCm(actualPixelsPerCm);
+          setRulerLength(rect.height);
         }
       } else {
-        // Fallback: use viewport-based calculation
+        // احتياطي: استخدام حساب مبني على العرض المرئي
         const viewportWidth = window.innerWidth;
-        // Assume page takes about 80% of viewport width for A4
+        // افترض أن الصفحة تأخذ حوالي 80% من عرض العرض لـ A4
         const estimatedPageWidth = Math.min(viewportWidth * 0.8, 794); // 794px ≈ 21cm at 96dpi
         const estimatedPixelsPerCm = estimatedPageWidth / widthCm;
         setPixelsPerCm(estimatedPixelsPerCm);
+        setRulerLength(estimatedPageWidth);
       }
     };
 
-    // Calculate on mount and window resize
+    // حساب عند التحميل وتغيير حجم النافذة
     calculatePixelsPerCm();
     window.addEventListener('resize', calculatePixelsPerCm);
     
-    // Also recalculate after a short delay (for elements that load later)
+    // إعادة حساب بعد تأخير قصير (للعناصر التي تحمل لاحقاً)
     const timer = setTimeout(calculatePixelsPerCm, 500);
 
     return () => {
       window.removeEventListener('resize', calculatePixelsPerCm);
       clearTimeout(timer);
     };
-  }, [orientation, widthCm, heightCm]);
+  }, [orientation, widthCm, heightCm, targetElement]);
 
   const lengthInCm = Math.floor(orientation === 'horizontal' ? widthCm : heightCm);
   
@@ -72,12 +85,26 @@ const Ruler = ({ orientation = 'horizontal', isDarkMode }: { orientation?: 'hori
     );
   }
 
+  const rulerStyle: React.CSSProperties = orientation === 'horizontal' 
+    ? {
+        width: `${rulerLength}px`,
+        height: '25px',
+        top: '-30px',
+        left: '0',
+        right: 'auto'
+      }
+    : {
+        height: `${rulerLength}px`,
+        width: '25px',
+        top: '0',
+        right: '-30px',
+        bottom: 'auto'
+      };
+
   return (
     <div 
       className={`ruler-container ${orientation} ${isDarkMode ? 'dark' : ''}`}
-      style={{
-        [orientation === 'horizontal' ? 'width' : 'height']: `${lengthInCm * pixelsPerCm}px`
-      }}
+      style={rulerStyle}
     >
       {numbers}
     </div>
