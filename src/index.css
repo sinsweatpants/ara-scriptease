@@ -561,26 +561,27 @@ body {
 
 /* ========================== المساطر (Ruler) ================================ */
 .ruler-container {
-  position: absolute;
-  background: #e0e0e0;
+  position: fixed;
+  background: linear-gradient(to bottom, #f0f0f0 0%, #e0e0e0 100%);
   border: 1px solid #ccc;
-  z-index: 10;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .ruler-container.horizontal {
   top: 0;
   left: 0;
-  right: 0;
-  height: 20px;
+  height: 25px;
   border-bottom: 2px solid #999;
+  /* Width will be set dynamically by component */
 }
 
 .ruler-container.vertical {
   top: 0;
   right: 0;
-  bottom: 0;
-  width: 20px;
+  width: 25px;
   border-left: 2px solid #999;
+  /* Height will be set dynamically by component */
 }
 
 .ruler-number {
@@ -589,22 +590,66 @@ body {
   font-weight: bold;
   color: #333;
   user-select: none;
+  text-shadow: 0 1px 1px rgba(255,255,255,0.8);
 }
 
 .ruler-container.horizontal .ruler-number {
-  top: 2px;
+  top: 3px;
 }
 
 .ruler-container.vertical .ruler-number {
-  right: 2px;
+  right: 3px;
   writing-mode: vertical-rl;
+  text-orientation: mixed;
 }
 
 .ruler-container.dark {
-  background: #333;
+  background: linear-gradient(to bottom, #444 0%, #333 100%);
   border-color: #555;
 }
 
 .ruler-container.dark .ruler-number {
   color: #fff;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.8);
+}
+
+/* ضبط المساطر لتتطابق مع أبعاد A4 */
+.ruler-container::before {
+  content: '';
+  position: absolute;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 37.7px,
+    #999 37.7px,
+    #999 37.8px
+  );
+}
+
+.ruler-container.horizontal::before {
+  top: 15px;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: repeating-linear-gradient(
+    90deg,
+    transparent 0px,
+    transparent 37.7px,
+    #999 37.7px,
+    #999 37.8px
+  );
+}
+
+.ruler-container.vertical::before {
+  top: 0;
+  bottom: 0;
+  right: 15px;
+  width: 5px;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 37.7px,
+    #999 37.7px,
+    #999 37.8px
+  );
 }
