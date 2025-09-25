@@ -10,7 +10,11 @@ export default defineConfig({
     hmr: {
       clientPort: 443,
     },
-    allowedHosts: ['all'],
+    allowedHosts: [
+      'localhost',
+      '.replit.dev',
+      '.janeway.replit.dev'
+    ],
   },
   resolve: {
     alias: {
