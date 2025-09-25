@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { AlignLeft, Undo, Redo, FileText } from "lucide-react";
 import { createPagedHTML } from "@/lib/screenplay-parser";
 import { useToast } from "@/hooks/use-toast";
-import Ruler from "./ruler";
+import Ruler from "../ui/ruler";
 import { AdvancedPaginationEngine } from "@/lib/advanced-pagination-engine";
 
 interface PaginatedUnifiedEditorProps {
@@ -401,11 +401,9 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
       </div>
 
       {/* Paginated Editor with Rulers */}
-      <div className="relative">
-        {/* المساطر */}
+      <div className="editor-area-wrapper" style={{ position: 'relative', paddingTop: '30px', paddingRight: '30px', margin: '0 auto' }}>
         <Ruler orientation="horizontal" />
         <Ruler orientation="vertical" />
-        
         <div
           ref={editorRef}
           className="screenplay-pages-container"
@@ -416,11 +414,14 @@ export default function PaginatedUnifiedEditor({ content, onContentChange }: Pag
           suppressContentEditableWarning={true}
           style={{
             outline: 'none',
-            minHeight: '297mm',
-            background: '#f5f5f5',
-            padding: '20px',
-            marginTop: '20px',
-            marginRight: '20px',
+            height: '29.7cm',
+            width: '21cm',
+            background: '#ffffff',
+            boxShadow: '0 4px 12px rgba(0,0,0,0.2)',
+            paddingTop: '2.54cm',      // 1 inch
+            paddingBottom: '2.54cm',   // 1 inch
+            paddingRight: '3.81cm',     // 1.5 inches
+            paddingLeft: '2.54cm'       // 1 inch
           }}
         />
       </div>
