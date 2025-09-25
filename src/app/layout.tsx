@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import Ruler from "@/components/ui/Ruler";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -26,7 +27,10 @@ export default function RootLayout({
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        style={{ paddingTop: '20px', paddingLeft: '20px' }}
       >
+        <Ruler orientation="horizontal" />
+        <Ruler orientation="vertical" />
         {children}
       </body>
     </html>
